@@ -25,7 +25,7 @@ import org.openhab.habdroid.R
 object CrashReportingHelper {
     private val TAG = CrashReportingHelper::class.java.simpleName
 
-    // TODO: replace with the real Stromkreis support mailbox before the first release
+    // Stromkreis support mailbox (stromkreis.net mail is hosted on the Stromkreis mailcow)
     private const val CRASH_REPORT_MAIL = "app@stromkreis.net"
 
     fun initialize(app: Application) {
