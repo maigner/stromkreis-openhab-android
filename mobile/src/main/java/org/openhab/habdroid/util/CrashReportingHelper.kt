@@ -25,6 +25,9 @@ import org.openhab.habdroid.R
 object CrashReportingHelper {
     private val TAG = CrashReportingHelper::class.java.simpleName
 
+    // TODO: replace with the real Stromkreis support mailbox before the first release
+    private const val CRASH_REPORT_MAIL = "app@stromkreis.net"
+
     fun initialize(app: Application) {
         val outdatedBuildMillis = BuildConfig.TIMESTAMP + (6L * 30 * 24 * 60 * 60 * 1000) // 6 months after build
         val isOutdated = outdatedBuildMillis < System.currentTimeMillis()
@@ -50,7 +53,7 @@ object CrashReportingHelper {
                     .build(),
                 MailSenderConfigurationBuilder()
                     .withEnabled(true)
-                    .withMailTo("apps@openhabfoundation.org")
+                    .withMailTo(CRASH_REPORT_MAIL)
                     .build()
             )
 

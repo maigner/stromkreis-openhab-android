@@ -1,8 +1,6 @@
 [versions]
 android-gradle-plugin = "8.11.2"
 kotlin-gradle-plugin = "2.0.21"
-google-services = "4.4.2"
-firebase-crashlytics-gradle = "3.0.3"
 unmock-plugin = "0.8.0"
 about-libraries-plugin = "11.2.3"
 missing-metadata-guava = "31.1.1"
@@ -36,13 +34,11 @@ colorpicker = "0.1.1"
 okhttp = "4.12.0"
 jmdns = "3.6.1"
 
-play-services-maps = "19.0.0"
 osmdroid-android = "6.1.20"
 
 material-about-library = "3.1.2"
 about-libraries = "11.2.3"
 
-firebase-bom = "33.7.0"
 acra = "5.12.0"
 
 mockito-core = "5.11.0"
@@ -60,8 +56,6 @@ androidchart = "3.1.0.26"
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
 
-google-services-plugin = { module = "com.google.gms:google-services", version.ref = "google-services" }
-firebase-crashlytics-gradle-plugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebase-crashlytics-gradle" }
 unmock-plugin = { module = "com.github.bjoernq:unmockplugin", version.ref = "unmock-plugin" }
 aboutlibraries-plugin = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "about-libraries-plugin" }
 missing-metadata-guava-plugin = { module = "de.jjohannes.gradle:missing-metadata-guava", version.ref = "missing-metadata-guava" }
@@ -83,7 +77,6 @@ preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = 
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work-manager" }
-work-gcm = { module = "androidx.work:work-gcm", version.ref = "work-manager" }
 security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
@@ -106,16 +99,11 @@ okhttp-sse = { module = "com.squareup.okhttp3:okhttp-sse", version.ref = "okhttp
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdns" }
 
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid-android" }
 
 material-about-library = { module = "com.github.daniel-stoneuk:material-about-library", version.ref = "material-about-library" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "about-libraries" }
 aboutlibraries = { module = "com.mikepenz:aboutlibraries", version.ref = "about-libraries" }
-
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
-firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 
 acra-mail = { module = "ch.acra:acra-mail", version.ref = "acra" }
 acra-notification = { module = "ch.acra:acra-notification", version.ref = "acra" }

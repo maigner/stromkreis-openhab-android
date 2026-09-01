@@ -40,6 +40,7 @@ jobs:
           fi
           echo "Use $releaseFlavor"
           echo "releaseFlavor=$releaseFlavor"   >> $GITHUB_ENV
+          echo "releaseFlavorLower=$(echo $releaseFlavor | tr A-Z a-z)" >> $GITHUB_ENV
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -57,13 +58,13 @@ jobs:
           echo -e "mapsApiKey=AIzaSyA2t2893e9wccs9EnlnauJRgtqFNYQSp-o\norg.gradle.daemon=false" >> ~/.gradle/gradle.properties
 
       - name: Build APK
-        run: bash gradlew :mobile:assembleFull${{ env.releaseFlavor }}Release
+        run: bash gradlew :mobile:assemble${{ env.releaseFlavor }}Release
 
       - uses: r0adkll/sign-android-release@v1.0.4
         name: Sign APK
         id: sign_app
         with:
-          releaseDirectory: mobile/build/outputs/apk/full${{ env.releaseFlavor }}/release
+          releaseDirectory: mobile/build/outputs/apk/${{ env.releaseFlavorLower }}/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: "sign"
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -79,13 +80,13 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build App Bundle
-        run: bash gradlew :mobile:bundleFull${{ env.releaseFlavor }}Release
+        run: bash gradlew :mobile:bundle${{ env.releaseFlavor }}Release
 
       - uses: r0adkll/sign-android-release@v1.0.4
         name: Sign App Bundle
         id: sign_aab
         with:
-          releaseDirectory: mobile/build/outputs/bundle/full${{ env.releaseFlavor }}Release
+          releaseDirectory: mobile/build/outputs/bundle/${{ env.releaseFlavorLower }}Release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: "sign"
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}

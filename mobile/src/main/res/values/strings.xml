@@ -41,6 +41,16 @@
     <string name="about_upstream">Basiert auf der openHAB-App</string>
     <string name="about_upstream_summary">Das Stromkreis-Gateway läuft auf openHAB; diese App ist ein Fork des openHAB-Android-Clients (EPL-2.0).</string>
 
+    <!-- Notification polling and crash reports (no Google services) -->
+    <string name="push_notification_status_impaired">Benachrichtigungen werden nur beim Öffnen der App und optional in regelmäßigen Abständen von der Stromkreis-Cloud abgerufen (kein Push). Für weitere Informationen hier berühren.</string>
+    <string name="push_notification_status_disabled">Benachrichtigungen sind deaktiviert</string>
+    <string name="notification_channel_crash_reports">Absturzberichte</string>
+    <string name="notification_channel_crash_reports_description">Wird verwendet, um zu fragen, ob ein Absturzbericht gesendet werden soll</string>
+    <string name="crash_report_notification_title">Stromkreis ist abgestürzt</string>
+    <string name="crash_report_notification_text">Helfen Sie Stromkreis durch Senden des Absturzberichts zu verbessern</string>
+    <string name="crash_report_notification_send_mail">E-Mail senden</string>
+    <string name="open_in_maps">In OpenStreetMap öffnen</string>
+
     <!-- Main menu items -->
     <string name="mainmenu_openhab_sitemaps">Sitemaps</string>
     <string name="mainmenu_openhab_preferences">Einstellungen</string>

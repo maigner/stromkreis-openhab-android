@@ -1,8 +1,5 @@
 import com.mikepenz.aboutlibraries.plugin.DuplicateMode
 
-def taskRequests = getGradle().getStartParameter().getTaskRequests().toString()
-def isFoss = taskRequests.contains("Foss") || taskRequests.contains("foss")
-
 buildscript {
     repositories {
         mavenCentral()
@@ -11,8 +8,6 @@ buildscript {
     }
 
     dependencies {
-        classpath libs.google.services.plugin
-        classpath libs.firebase.crashlytics.gradle.plugin
         classpath libs.unmock.plugin
         classpath libs.aboutlibraries.plugin
         classpath libs.missing.metadata.guava.plugin
@@ -25,11 +20,6 @@ apply plugin: "kotlin-parcelize"
 apply plugin: "de.mobilej.unmock"
 apply plugin: "com.mikepenz.aboutlibraries.plugin"
 apply plugin: "de.jjohannes.missing-metadata-guava"
-
-if (!isFoss) {
-    apply plugin: "com.google.gms.google-services"
-    apply plugin: "com.google.firebase.crashlytics"
-}
 
 android {
     useLibrary "org.apache.http.legacy"
@@ -59,14 +49,10 @@ android {
         }
     }
 
-    flavorDimensions "license", "release"
+    // No Google services: notifications are polled from the Stromkreis Cloud, crash reports go via
+    // ACRA e-mail and map widgets use OpenStreetMap (osmdroid).
+    flavorDimensions "release"
     productFlavors {
-        full {
-            dimension "license"
-            manifestPlaceholders = [maps_api_key: project.findProperty("mapsApiKey") ?: ""]
-        }
-        foss { dimension "license" }
-
         stable { dimension "release" }
         beta {
             dimension "release"
@@ -159,7 +145,6 @@ dependencies {
     implementation libs.multidex
 
     implementation libs.work.runtime.ktx
-    fullImplementation libs.work.gcm
 
     implementation libs.security.crypto
 
@@ -185,8 +170,7 @@ dependencies {
     implementation libs.photoview
     implementation libs.skeletonlayout
 
-    fullImplementation libs.play.services.maps
-    fossImplementation libs.osmdroid.android
+    implementation libs.osmdroid.android
 
     implementation libs.material.about.library
     implementation libs.aboutlibraries.core
@@ -194,12 +178,8 @@ dependencies {
 
     implementation libs.androidchart
 
-    implementation platform(libs.firebase.bom)
-    fullImplementation libs.firebase.messaging.ktx
-    fullImplementation libs.firebase.crashlytics.ktx
-
-    fossImplementation libs.acra.mail
-    fossImplementation libs.acra.notification
+    implementation libs.acra.mail
+    implementation libs.acra.notification
 
     testImplementation libs.mockito.core
     testImplementation libs.mockito.kotlin

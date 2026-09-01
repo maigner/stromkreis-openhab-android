@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavor: [FullBeta, FullStable, FossBeta, FossStable]
+        flavor: [Beta, Stable]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
       - name: Configure Gradle
         run: |
           mkdir -p ~/.gradle/
-          echo -e "mapsApiKey=AIzaSyA2t2893e9wccs9EnlnauJRgtqFNYQSp-o\norg.gradle.daemon=false" >> ~/.gradle/gradle.properties
+          echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 
       - name: Build
         run: ./gradlew :mobile:assemble${{ matrix.flavor }}

@@ -41,23 +41,24 @@ The app is developed using Android Studio.
 - Download and install [Android Studio](https://developer.android.com/studio)
 - Check out the code from GitHub via Android Studio
 - Install SDKs and Gradle if you get asked
-- Click on "Build Variants" on the left side and change the build variant of the module "mobile" to "fullStableDebug".
+- Click on "Build Variants" on the left side and change the build variant of the module "mobile" to "stableDebug".
 
-Command line: `./gradlew :mobile:assembleFullStableDebug` and `./gradlew :mobile:testFullStableDebugUnitTest`
+Command line: `./gradlew :mobile:assembleStableDebug` and `./gradlew :mobile:testStableDebugUnitTest`
 (JDK 17 and an Android SDK with platform 35 are required).
 
 Before producing any amount of code please have a look at [contribution guidelines](CONTRIBUTING.md)
 
-## Build flavors
+## No Google services
 
-An optional build flavor "foss" is available for distribution without Google services. This build has FCM and crash
-reporting removed and will not be able to receive push notifications from the Stromkreis Cloud; notifications are
-polled instead.
+The app deliberately contains no Google services (what upstream calls the "foss" flavor is the only variant):
 
-Application IDs: `net.stromkreis.app` (stable) and `net.stromkreis.app.beta` (beta). Push notifications require a
-Firebase project that contains these application IDs; `mobile/google-services.json` has to be replaced accordingly.
+* no Firebase Cloud Messaging: the current data is fetched from the Stromkreis Cloud whenever the app is opened;
+  optionally, notifications can be polled periodically (Settings → Benachrichtigungen)
+* no Crashlytics: crash reports are offered as e-mail via ACRA
+* no Google Maps: map widgets use OpenStreetMap (osmdroid)
 
-For using map view support in the "full" build flavor, you need to visit the [Maps API page](https://developers.google.com/maps/android) and generate an API key via the 'Get a key' button at the top. Then add a line in the following format to the 'gradle.properties' file (either in the same directory as this readme file, or in $HOME/.gradle): `mapsApiKey=<key>`, replacing `<key>` with the API key you just obtained.
+Application IDs: `net.stromkreis.app` (stable) and `net.stromkreis.app.beta` (beta). Both are fine for Google Play,
+F-Droid or direct APK distribution.
 
 ## Trademark Disclaimer
 

@@ -88,7 +88,7 @@ fingerprints. `stromkreis://` links work immediately without server support, whi
 ## In-app
 
 - Onboarding UI: `mobile/src/main/java/org/openhab/habdroid/ui/OnboardingActivity.kt` with
-  `QrCodeAnalyzer.kt` (CameraX + ZXing, works in the FOSS flavor too) and
+  `QrCodeAnalyzer.kt` (CameraX + ZXing, no Google services) and
   `mobile/src/main/res/layout/activity_onboarding.xml`.
 - `MainActivity` starts the onboarding when the active server has no cloud login; the "server not
   found" screen offers *Einrichtungscode scannen*.
@@ -97,10 +97,8 @@ fingerprints. `stromkreis://` links work immediately without server support, whi
   encrypted preferences); the server is created if none exists, named after `siteName`. The start
   page is set to Main UI. The remote URL defaults to `https://hac.stromkreis.net` in the settings UI.
 
-## Push notifications
+## Notifications
 
-The Stromkreis Cloud is an openHAB Cloud instance, so the existing FCM registration works unchanged
-once the app is registered in a Firebase project. `mobile/google-services.json` still points at the
-upstream `openhab-mobile` Firebase project with the application IDs renamed (as the iOS fork does);
-replace it with the file from a Stromkreis-owned Firebase project that contains `net.stromkreis.app`
-and `net.stromkreis.app.beta` before shipping the `full` flavor.
+The app contains no Google services, so there is no push. The current data is fetched from the
+Stromkreis Cloud whenever the app is opened; cloud notifications can optionally be polled
+periodically (Settings → Benachrichtigungen, off by default).
