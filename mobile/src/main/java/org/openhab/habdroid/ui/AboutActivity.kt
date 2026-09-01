@@ -32,6 +32,7 @@ import java.util.Calendar
 import java.util.Locale
 import org.openhab.habdroid.BuildConfig
 import org.openhab.habdroid.R
+import org.openhab.habdroid.core.StromkreisSetup
 import org.openhab.habdroid.databinding.ActivityAboutBinding
 import org.openhab.habdroid.util.ScreenLockMode
 import org.openhab.habdroid.util.Util
@@ -177,7 +178,7 @@ class AboutActivity :
                     .text(R.string.about_privacy_policy)
                     .icon(R.drawable.ic_security_grey_24dp)
                     .setOnClickAction(
-                        makeClickRedirect(context, "https://www.openhabfoundation.org/privacy.html#android-app")
+                        makeClickRedirect(context, "https://stromkreis.net/datenschutz")
                     )
                     .build()
             )
@@ -186,30 +187,17 @@ class AboutActivity :
                 .title(R.string.about_community)
             ohCommunityCard.addItem(
                 MaterialAboutActionItem.Builder()
-                    .text(R.string.about_docs)
-                    .icon(R.drawable.ic_file_document_box_multiple_outline_grey_24dp)
-                    .setOnClickAction(makeClickRedirect(context, "https://www.openhab.org/docs/apps/android.html"))
-                    .build()
-            )
-            ohCommunityCard.addItem(
-                MaterialAboutActionItem.Builder()
-                    .text(R.string.about_community_forum)
-                    .icon(R.drawable.ic_forum_outline_grey_24dp)
-                    .setOnClickAction(makeClickRedirect(context, "https://community.openhab.org/"))
-                    .build()
-            )
-            ohCommunityCard.addItem(
-                MaterialAboutActionItem.Builder()
-                    .text(R.string.about_translation)
-                    .icon(R.drawable.ic_translate_grey_24dp)
-                    .setOnClickAction(makeClickRedirect(context, "https://crowdin.com/profile/openhab-bot"))
-                    .build()
-            )
-            ohCommunityCard.addItem(
-                MaterialAboutActionItem.Builder()
-                    .text(R.string.about_foundation)
+                    .text(R.string.about_website)
                     .icon(R.drawable.ic_people_outline_grey_24dp)
-                    .setOnClickAction(makeClickRedirect(context, "https://www.openhabfoundation.org/"))
+                    .setOnClickAction(makeClickRedirect(context, StromkreisSetup.PLATFORM_ORIGIN))
+                    .build()
+            )
+            ohCommunityCard.addItem(
+                MaterialAboutActionItem.Builder()
+                    .text(R.string.about_upstream)
+                    .subText(R.string.about_upstream_summary)
+                    .icon(R.drawable.ic_file_document_box_multiple_outline_grey_24dp)
+                    .setOnClickAction(makeClickRedirect(context, URL_TO_UPSTREAM))
                     .build()
             )
 
@@ -220,7 +208,8 @@ class AboutActivity :
         }
 
         companion object {
-            private const val URL_TO_GITHUB = "https://github.com/openhab/openhab-android"
+            private const val URL_TO_GITHUB = "https://github.com/maigner/stromkreis-openhab-android"
+            private const val URL_TO_UPSTREAM = "https://github.com/openhab/openhab-android"
 
             fun makeClickRedirect(context: Context, url: String) = MaterialAboutItemOnClickAction {
                 url.toUri().openInBrowser(context)

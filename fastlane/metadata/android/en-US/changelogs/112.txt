@@ -1,2 +1,0 @@
-## Fixed
-* Fix NPE in colorpicker (#1220)

@@ -1,2 +1,0 @@
-## Fixed
-* Allow some mixed content in WebViews (#2701)

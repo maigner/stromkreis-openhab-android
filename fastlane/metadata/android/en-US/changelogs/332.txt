@@ -1,2 +1,0 @@
-## Changed
-* Android 11 Support (#2140)

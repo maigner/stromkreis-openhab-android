@@ -1,2 +1,0 @@
-## Fixed
-* Fix slider behavior for color items  (#1660)

@@ -1,1 +1,0 @@
-Vendor and technology agnostic open source home automation

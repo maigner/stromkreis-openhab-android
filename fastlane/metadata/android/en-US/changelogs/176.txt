@@ -1,3 +1,0 @@
-## Changed
-* Improve LogActivity (#1500)
-* Show Toast if FCM registration fails (#1501)

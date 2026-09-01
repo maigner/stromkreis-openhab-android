@@ -1,4 +1,0 @@
-## Added
-* Open tile prefs when long clicking tile (#2248) 
-* Start discovery in intro (#2249)
-* Add quick tiles and send dev info to intro (#2233) 

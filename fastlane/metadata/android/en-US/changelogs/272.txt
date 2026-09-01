@@ -1,5 +1,0 @@
-## Added
-* Show success toast after writing tag (#1890)
-
-## Fixed
-* Respect search when refreshing item picker (#1889)

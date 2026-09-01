@@ -1,2 +1,0 @@
-## Fixed
-* Color picker: Always send HSV (#2016)

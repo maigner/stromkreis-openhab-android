@@ -1,1 +1,0 @@
-* Reporting disconnect from charging events immediately (#2798) 

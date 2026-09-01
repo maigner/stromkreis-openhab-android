@@ -1,12 +1,12 @@
-# Contributing to openHAB Android application
+# Contributing to the Stromkreis Android application
 
-Want to hack on openHAB Android? Awesome!
+Want to hack on the Stromkreis Android app? Awesome!
 Here are instructions to get you started.
 They are probably not perfect, please let us know if anything feels wrong or incomplete.
 
 ## Reporting Issues
 
-Please report [Android specific issues here](https://github.com/openhab/openhab-android/issues).
+Please report [Android specific issues here](https://github.com/maigner/stromkreis-openhab-android/issues).
 
 ## Build Environment
 

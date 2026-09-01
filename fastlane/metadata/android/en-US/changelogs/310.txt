@@ -1,2 +1,0 @@
-## Fixed
-* Fix retry button of video widget (#2131)

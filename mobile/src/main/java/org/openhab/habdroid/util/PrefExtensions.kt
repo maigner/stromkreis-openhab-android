@@ -24,7 +24,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.openhab.habdroid.R
 import org.openhab.habdroid.core.connection.Connection
-import org.openhab.habdroid.core.connection.DemoConnection
 import org.openhab.habdroid.model.DefaultSitemap
 import org.openhab.habdroid.model.IconFormat
 import org.openhab.habdroid.model.ServerConfiguration
@@ -59,12 +58,9 @@ fun SharedPreferences.getLocalUrl(id: Int = getActiveServerId()): String =
 fun SharedPreferences.getRemoteUrl(id: Int = getActiveServerId()): String =
     getStringOrNull(PrefKeys.buildServerKey(id, PrefKeys.REMOTE_URL_PREFIX)).orEmpty()
 
-fun SharedPreferences.getDefaultSitemap(connection: Connection?, id: Int = getActiveServerId()): DefaultSitemap? {
-    if (connection is DemoConnection) {
-        return DefaultSitemap("demo", "demo")
-    }
-    return ServerConfiguration.getDefaultSitemap(this, id)
-}
+@Suppress("UNUSED_PARAMETER")
+fun SharedPreferences.getDefaultSitemap(connection: Connection?, id: Int = getActiveServerId()): DefaultSitemap? =
+    ServerConfiguration.getDefaultSitemap(this, id)
 
 fun SharedPreferences.getIconFormat(): IconFormat {
     val serverProps = getInt(PrefKeys.PREV_SERVER_FLAGS, 0)
@@ -74,8 +70,6 @@ fun SharedPreferences.getIconFormat(): IconFormat {
     val formatString = getStringOrFallbackIfEmpty(PrefKeys.ICON_FORMAT, "PNG")
     return if (formatString == "SVG") IconFormat.Svg else IconFormat.Png
 }
-
-fun SharedPreferences.isDemoModeEnabled(): Boolean = getBoolean(PrefKeys.DEMO_MODE, false)
 
 fun SharedPreferences.isDebugModeEnabled(): Boolean = getBoolean(PrefKeys.DEBUG_MESSAGES, false)
 
@@ -204,10 +198,8 @@ fun SharedPreferences.Editor.putPrimaryServerId(id: Int) {
     putInt(PrefKeys.PRIMARY_SERVER_ID, id)
 }
 
+@Suppress("UNUSED_PARAMETER")
 fun SharedPreferences.updateDefaultSitemap(connection: Connection?, sitemap: Sitemap?, id: Int = getActiveServerId()) {
-    if (connection is DemoConnection) {
-        return
-    }
     val defaultSitemap = sitemap?.let { DefaultSitemap(sitemap.name, sitemap.label) }
     ServerConfiguration.saveDefaultSitemap(this, id, defaultSitemap)
 }

@@ -639,7 +639,7 @@ fun ServiceInfo.addToPrefs(context: Context) {
 
     val config = ServerConfiguration(
         context.getPrefs().getNextAvailableServerId(),
-        context.getString(R.string.openhab),
+        context.getString(R.string.stromkreis),
         ServerPath("https://$address:$port", null, null),
         null,
         null,

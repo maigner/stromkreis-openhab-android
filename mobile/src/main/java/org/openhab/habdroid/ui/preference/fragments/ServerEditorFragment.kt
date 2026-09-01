@@ -353,7 +353,7 @@ class ServerEditorFragment :
         @VisibleForTesting
         fun beautifyUrl(url: String): String {
             val host = url.toHttpUrlOrNull()?.host ?: url
-            return if (HttpClient.isMyOpenhab(host)) "myopenHAB" else host
+            return if (HttpClient.isStromkreisCloud(host)) "Stromkreis-Cloud" else host
         }
     }
 }

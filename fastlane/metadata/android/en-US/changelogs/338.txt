@@ -1,2 +1,0 @@
-## Added
-* Display new openHAB 3 UI (#2244)

@@ -1,2 +1,0 @@
-## Added
-* Add a few more tile icons (#2078)

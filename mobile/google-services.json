@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:849058498762:android:9fcb28f91e1b4abb",
         "android_client_info": {
-          "package_name": "org.openhab.habdroid"
+          "package_name": "net.stromkreis.app"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "849058498762-079qmadgd5f5hkdve7lkrbubfi842afj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.openhab.habdroid",
+            "package_name": "net.stromkreis.app",
             "certificate_hash": "28e3a41b7c84483ded3df7b8fc2789b5c912badd"
           }
         },
@@ -55,7 +55,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:849058498762:android:1e73d9e722953c8b",
         "android_client_info": {
-          "package_name": "org.openhab.habdroid.beta"
+          "package_name": "net.stromkreis.app.beta"
         }
       },
       "oauth_client": [
@@ -63,7 +63,7 @@
           "client_id": "849058498762-b49s5qfketdcojkrue5mo1geh0k5q4pm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "org.openhab.habdroid.beta",
+            "package_name": "net.stromkreis.app.beta",
             "certificate_hash": "28e3a41b7c84483ded3df7b8fc2789b5c912badd"
           }
         },

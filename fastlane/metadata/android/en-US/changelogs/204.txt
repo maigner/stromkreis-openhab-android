@@ -1,2 +1,0 @@
-## Changed
-* Use MaterialButtonToggleGroup for segmented switch. (#1598)

@@ -1,2 +1,0 @@
-## Fixed
-* Item Picker: Wait for connection (#1705)

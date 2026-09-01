@@ -1,2 +1,0 @@
-## Added
-* Send call state to server (#1515)

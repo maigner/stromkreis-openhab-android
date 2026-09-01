@@ -1,3 +1,0 @@
-## Changed
-* Bump targetSdk to Android 12 (#2729)
-* Bump several dependencies

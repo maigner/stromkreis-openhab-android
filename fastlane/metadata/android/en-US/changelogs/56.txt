@@ -1,3 +1,0 @@
-<b>Fixed</b>
-* Fix voice interpreter API URL. (#871)
-* Fix handling of URL query parameters. (#870) 

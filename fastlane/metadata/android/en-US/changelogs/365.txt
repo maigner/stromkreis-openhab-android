@@ -1,2 +1,0 @@
-## Added
-* Add Frontail drawer entry (#2337)

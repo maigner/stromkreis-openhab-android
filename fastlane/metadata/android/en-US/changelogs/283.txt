@@ -1,2 +1,0 @@
-## Fixed
-* Fix WebView height when set to WRAP_CONTENT (#1979)

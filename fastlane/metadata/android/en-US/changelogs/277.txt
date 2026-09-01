@@ -1,5 +1,0 @@
-## Fixed
-* Don't show state in color picker title (#1923)
-
-## Changed
-* Theme navigation bar like background (#1895)

@@ -1,2 +1,0 @@
-## Fixed
-* Fix image item refresh. (#929)

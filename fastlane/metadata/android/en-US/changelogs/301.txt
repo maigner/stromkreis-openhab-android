@@ -1,2 +1,0 @@
-## Changed
-* Improve sending voice commands (#2083)

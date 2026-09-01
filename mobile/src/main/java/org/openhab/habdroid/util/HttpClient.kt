@@ -13,6 +13,7 @@
 
 package org.openhab.habdroid.util
 
+import org.openhab.habdroid.core.StromkreisSetup
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.annotation.ColorInt
@@ -343,6 +344,6 @@ class HttpClient(client: OkHttpClient, baseUrl: String?, username: String?, pass
                 "AppleWebKit/535.19 (KHTML, like Gecko) " +
                 "Chrome/18.0.1025.133 Mobile Safari/535.19"
 
-        fun isMyOpenhab(host: String) = host.matches("^(home.)?myopenhab.org$".toRegex())
+        fun isStromkreisCloud(host: String) = StromkreisSetup.isCloudHost(host)
     }
 }

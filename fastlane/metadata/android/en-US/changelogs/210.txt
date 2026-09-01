@@ -1,6 +1,0 @@
-## Fixed
-* Ignore "com.android.providers.calendar" for alarm clock (#1616)
-
-## Changed
-* Bump dependencies
-* Update translations

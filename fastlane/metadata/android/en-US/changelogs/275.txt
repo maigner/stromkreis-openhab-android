@@ -1,2 +1,0 @@
-## Added
-* Send Wi-Fi SSID to server (#1897)

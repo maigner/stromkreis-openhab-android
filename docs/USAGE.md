@@ -10,6 +10,11 @@ source: https://github.com/openhab/openhab-android/blob/main/docs/USAGE.md
 
 # Android App
 
+> This is the (unchanged) upstream openHAB documentation, kept for reference. The Stromkreis app is a fork of the
+> openHAB Android client; "openHAB server" below means the openHAB instance on your Stromkreis gateway and
+> "openHAB Cloud" the Stromkreis Cloud. Stromkreis-specific setup is described in
+> [stromkreis-onboarding.md](stromkreis-onboarding.md).
+
 The openHAB Android application is a native client for openHAB, compatible with phones and tablets.
 The app follows the basic principles of the other openHAB UIs, like Basic UI, and presents your predefined openHAB [sitemap(s)](https://www.openhab.org/docs/configuration/sitemaps.html) and other UIs, like Main UI.
 

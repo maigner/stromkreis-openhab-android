@@ -1,1 +1,0 @@
-- Fix interactive chart not working on OH prior to 5.0 

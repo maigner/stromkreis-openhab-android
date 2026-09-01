@@ -1,2 +1,0 @@
-## Fixed
-* Fix writing tags (#2859)

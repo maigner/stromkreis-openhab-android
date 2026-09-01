@@ -1,3 +1,0 @@
-## Fixed
-* Formatting label text output for Android app (#233)
-* Sliders not displaying stateformat (#767)

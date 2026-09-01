@@ -1,3 +1,0 @@
-• Fix issue with Grafana graphs
-• Hide notification sound settings on Android 8 and above. Please use Notification channels to change it.
-• Stability improvements

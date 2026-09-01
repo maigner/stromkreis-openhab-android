@@ -2,6 +2,12 @@
 <resources>
     <color name="black">#000000</color>
     <color name="openhab_orange">#ff5722</color>
+
+    <!-- Stromkreis brand colors (see the app icon) -->
+    <color name="stromkreis_green_dark">#1d4716</color>
+    <color name="stromkreis_green">#3f8a26</color>
+    <color name="stromkreis_green_light">#63b53b</color>
+    <color name="stromkreis_amber">#f59e0b</color>
     <color name="pref_icon_red">#D32F2F</color>
     <color name="pref_icon_green">#388E3C</color>
     <color name="pref_icon_orange">#F57C00</color>

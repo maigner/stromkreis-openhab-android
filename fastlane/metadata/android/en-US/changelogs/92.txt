@@ -1,3 +1,0 @@
-## Fixed
-* Fix NullPointerException in Setpoint (#1079)
-* Webview no longer displays Grafana panels (#1087)

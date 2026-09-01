@@ -1,2 +1,0 @@
-• Einstellbare Diagrammskalierung
-• Stabilitäts- und Performance-Verbesserungen

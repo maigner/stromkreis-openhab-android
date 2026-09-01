@@ -1,3 +1,0 @@
-## Fixed
-* Fix dynamic icons (#1879)
-* Fix selection of sitemap in demo mode (#1882)

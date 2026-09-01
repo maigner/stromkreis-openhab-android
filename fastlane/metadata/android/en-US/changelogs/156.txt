@@ -1,2 +1,0 @@
-## Fixed
-* Close HABPanel if sitemap shortcut is used (#1456)

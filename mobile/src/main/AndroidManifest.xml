@@ -168,13 +168,38 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity-alias>
+        <!-- Stromkreis onboarding: QR code scanner, stromkreis://setup links and
+             https://stromkreis.net/app/setup/<token> app links -->
+        <activity
+            android:name=".ui.OnboardingActivity"
+            android:label="@string/onboarding_title"
+            android:launchMode="singleTask"
+            android:exported="true"
+            android:theme="@style/openHAB.Onboarding">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" />
+                <data android:host="stromkreis.net" />
+                <data android:host="www.stromkreis.net" />
+                <data android:pathPrefix="/app/setup" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="stromkreis" />
+                <data android:host="setup" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.WriteTagActivity"
             android:label="@string/title_activity_openhabwritetag"
-            android:exported="false" />
-        <activity
-            android:name=".ui.IntroActivity"
-            android:label="@string/app_intro"
             android:exported="false" />
         <activity
             android:name="de.duenndns.ssl.MemorizingActivity"

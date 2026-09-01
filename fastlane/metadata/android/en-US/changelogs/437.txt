@@ -1,2 +1,0 @@
-• Fix widget creation
-• Support command options

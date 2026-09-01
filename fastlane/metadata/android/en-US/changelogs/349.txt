@@ -1,2 +1,0 @@
-## Added
-* Retry sitemap connection issues (#2363)

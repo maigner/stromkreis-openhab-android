@@ -1,3 +1,0 @@
-• Add app shortcuts
-• Add ability to view HABPanel
-• Fix issues with units, visibility and webview widgets

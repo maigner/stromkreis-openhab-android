@@ -38,16 +38,19 @@ class PreferencesUtilTest {
     fun testBeautifyHostName() {
         assertEquals("For invalid urls it should return the input value", "abc", beautifyUrl("abc"))
         assertEquals("For an empty string it should return an empty string", "", beautifyUrl(""))
-        assertEquals("URLs without scheme should treated like one with", "myopenHAB", beautifyUrl("myopenhab.org"))
-        assertEquals("For myopenhab.org it should return myopenHAB", "myopenHAB", beautifyUrl("https://myopenhab.org"))
         assertEquals(
-            "For home.myopenhab.org it should return myopenHAB",
-            "myopenHAB",
-            beautifyUrl("https://home.myopenhab.org")
+            "URLs without scheme should treated like one with",
+            "Stromkreis-Cloud",
+            beautifyUrl("hac.stromkreis.net")
         )
-        assertEquals("not.myopenhab.org", beautifyUrl("https://not.myopenhab.org"))
-        assertEquals("notmyopenhab.org", beautifyUrl("https://notmyopenhab.org"))
-        assertEquals("myopenhab.wrong_tld", beautifyUrl("https://myopenhab.WRONG_TLD"))
+        assertEquals(
+            "For hac.stromkreis.net it should return Stromkreis-Cloud",
+            "Stromkreis-Cloud",
+            beautifyUrl("https://hac.stromkreis.net")
+        )
+        assertEquals("not.stromkreis.net", beautifyUrl("https://not.stromkreis.net"))
+        assertEquals("myopenhab.org", beautifyUrl("https://myopenhab.org"))
+        assertEquals("stromkreis.wrong_tld", beautifyUrl("https://stromkreis.WRONG_TLD"))
     }
 
     @Test

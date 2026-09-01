@@ -1,2 +1,0 @@
-## Fixed
-* Catch NPE in OSM library (#1447)

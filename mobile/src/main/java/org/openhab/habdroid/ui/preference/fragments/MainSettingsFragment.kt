@@ -43,6 +43,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.openhab.habdroid.R
+import org.openhab.habdroid.ui.OnboardingActivity
 import org.openhab.habdroid.background.tiles.AbstractTileService
 import org.openhab.habdroid.background.tiles.getTileData
 import org.openhab.habdroid.core.CloudMessagingHelper
@@ -148,7 +149,7 @@ class MainSettingsFragment : AbstractSettingsFragment() {
         addServerPref.setOnPreferenceClickListener {
             val nextServerId = prefs.getNextAvailableServerId()
             val nextName = if (prefs.getConfiguredServerIds().isEmpty()) {
-                getString(R.string.openhab)
+                getString(R.string.stromkreis)
             } else {
                 getString(R.string.settings_server_default_name, nextServerId)
             }
@@ -156,6 +157,11 @@ class MainSettingsFragment : AbstractSettingsFragment() {
                 ServerConfiguration(nextServerId, nextName, null, null, null, null, null, false, null, null)
             )
             parentActivity.openSubScreen(f)
+            true
+        }
+
+        getPreference("stromkreis_setup").setOnPreferenceClickListener {
+            startActivity(Intent(it.context, OnboardingActivity::class.java))
             true
         }
 
@@ -357,8 +363,6 @@ class MainSettingsFragment : AbstractSettingsFragment() {
                     null
                 }
                 connCategory.addPreference(pref)
-                // The pref needs to be attached for doing this
-                pref.dependency = PrefKeys.DEMO_MODE
             }
         }
     }

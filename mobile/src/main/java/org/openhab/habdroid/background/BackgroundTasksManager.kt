@@ -83,7 +83,6 @@ import org.openhab.habdroid.util.getStringOrNull
 import org.openhab.habdroid.util.getWifiManager
 import org.openhab.habdroid.util.hasPermissions
 import org.openhab.habdroid.util.isDebugModeEnabled
-import org.openhab.habdroid.util.isDemoModeEnabled
 import org.openhab.habdroid.util.isItemUpdatePrefEnabled
 import org.openhab.habdroid.util.isTaskerPluginEnabled
 import org.openhab.habdroid.util.orDefaultIfEmpty
@@ -249,20 +248,8 @@ class BackgroundTasksManager : BroadcastReceiver() {
             when {
                 key == null -> return
 
-                key == PrefKeys.DEMO_MODE && prefs.isDemoModeEnabled() -> {
-                    // Demo mode was enabled -> cancel all uploads and clear DB
-                    // to clear out notifications
-                    with(WorkManager.getInstance(context)) {
-                        cancelAllWorkByTag(WORKER_TAG_ITEM_UPLOADS)
-                        cancelAllWorkByTag(WORKER_TAG_PERIODIC_TRIGGER)
-                        pruneWork()
-                    }
-                }
-
-                // Demo mode was disabled -> reschedule uploads
-                (key == PrefKeys.DEMO_MODE && !prefs.isDemoModeEnabled()) ||
-                    // Prefix has been changed -> reschedule uploads
-                    key == PrefKeys.DEV_ID ||
+                // Prefix has been changed -> reschedule uploads
+                key == PrefKeys.DEV_ID ||
                     key == PrefKeys.DEV_ID_PREFIX_BG_TASKS ||
                     key == PrefKeys.PRIMARY_SERVER_ID -> {
                     KNOWN_KEYS.forEach { knowKey -> scheduleWorker(context, knowKey, true) }
@@ -573,11 +560,7 @@ class BackgroundTasksManager : BroadcastReceiver() {
 
         fun scheduleWorker(context: Context, key: String, isImportant: Boolean, intent: Intent? = null) {
             val prefs = context.getPrefs()
-            val setting = if (prefs.isDemoModeEnabled()) {
-                Pair(false, "") // Don't attempt any uploads in demo mode
-            } else {
-                prefs.getStringOrNull(key).toItemUpdatePrefValue()
-            }
+            val setting = prefs.getStringOrNull(key).toItemUpdatePrefValue()
 
             if (key in KNOWN_PERIODIC_KEYS) {
                 schedulePeriodicTrigger(context)

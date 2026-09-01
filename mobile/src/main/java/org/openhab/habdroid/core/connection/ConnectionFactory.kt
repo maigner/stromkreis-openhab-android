@@ -51,7 +51,6 @@ import org.openhab.habdroid.util.getActiveServerId
 import org.openhab.habdroid.util.getPrimaryServerId
 import org.openhab.habdroid.util.getStringOrNull
 import org.openhab.habdroid.util.isDebugModeEnabled
-import org.openhab.habdroid.util.isDemoModeEnabled
 
 /**
  * A factory class, which is the main entry point to get a Connection to a specific openHAB
@@ -256,29 +255,17 @@ class ConnectionFactory internal constructor(
 
     @VisibleForTesting
     fun updateConnections(updateStateImmediately: Boolean = false) {
-        if (prefs.isDemoModeEnabled()) {
-            if (activeConn?.local is DemoConnection) {
-                // demo mode already was enabled
-                return
-            }
-            val conn = DemoConnection(httpClient)
-            activeConn = ServerConnections(conn, conn)
-            primaryConn = activeConn
-            val connResult = ConnectionResultWithSource(ConnectionResult(conn, null), activeConn)
-            updateState(false, connResult, connResult, CloudConnectionResult(null, null))
+        val activeServer = prefs.getActiveServerId()
+        activeConn = loadServerConnections(activeServer)
+
+        val primaryServer = prefs.getPrimaryServerId()
+        primaryConn = if (primaryServer == activeServer) {
+            activeConn
         } else {
-            val activeServer = prefs.getActiveServerId()
-            activeConn = loadServerConnections(activeServer)
-
-            val primaryServer = prefs.getPrimaryServerId()
-            primaryConn = if (primaryServer == activeServer) {
-                activeConn
-            } else {
-                loadServerConnections(primaryServer)
-            }
-
-            updateState(!updateStateImmediately, null, null, null)
+            loadServerConnections(primaryServer)
         }
+
+        updateState(!updateStateImmediately, null, null, null)
         triggerConnectionUpdateIfNeeded()
     }
 
@@ -302,12 +289,8 @@ class ConnectionFactory internal constructor(
     }
 
     private fun updateHttpClientForClientCert(forceUpdate: Boolean) {
-        val clientCertAlias = if (prefs.isDemoModeEnabled()) {
-            // No client cert in demo mode
-            null
-        } else {
+        val clientCertAlias =
             prefs.getStringOrNull(PrefKeys.buildServerKey(prefs.getActiveServerId(), PrefKeys.SSL_CLIENT_CERT_PREFIX))
-        }
         val keyManagers = if (clientCertAlias != null) {
             arrayOf<KeyManager>(ClientKeyManager(context, clientCertAlias))
         } else {
@@ -365,10 +348,6 @@ class ConnectionFactory internal constructor(
     private fun triggerConnectionUpdateIfNeeded() {
         pendingChecks.forEach { it.cancel() }
         pendingChecks.clear()
-
-        if (activeConn?.local is DemoConnection) {
-            return
-        }
 
         val active = activeConn
         val primary = primaryConn
@@ -586,7 +565,6 @@ class ConnectionFactory internal constructor(
     companion object {
         private val TAG = ConnectionFactory::class.java.simpleName
         private val UPDATE_TRIGGERING_KEYS = listOf(
-            PrefKeys.DEMO_MODE,
             PrefKeys.ACTIVE_SERVER_ID,
             PrefKeys.PRIMARY_SERVER_ID
         )

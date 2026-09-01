@@ -1,2 +1,0 @@
-## Fixed
-* Fix divider not showing when there're invible widgets (#2157)

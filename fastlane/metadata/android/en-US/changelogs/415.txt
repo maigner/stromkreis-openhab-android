@@ -1,2 +1,0 @@
-## Fixed
-* Fix voice commands (#2777)

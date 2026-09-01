@@ -1,2 +1,0 @@
-## Added
-* Add amoled/black theme (#1945)

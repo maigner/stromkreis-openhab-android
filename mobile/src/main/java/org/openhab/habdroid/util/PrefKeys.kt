@@ -17,7 +17,6 @@ object PrefKeys {
     /**
      * Settings keys
      */
-    const val DEMO_MODE = "default_openhab_demomode"
     const val SERVER_IDS = "server_ids"
     const val ACTIVE_SERVER_ID = "active_server_id"
     const val SERVER_NAME_PREFIX = "server_name_"

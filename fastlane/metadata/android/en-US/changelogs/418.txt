@@ -1,2 +1,0 @@
-• Add support for Android 11 device controls 
-• Render switch items with mappings as selection when too wide

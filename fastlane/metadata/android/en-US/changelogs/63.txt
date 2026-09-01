@@ -1,2 +1,0 @@
-## Changed
-* Refactor image loading (#850)

@@ -1,2 +1,0 @@
-## Added
-* Click on charts to view them full screen (#1803)

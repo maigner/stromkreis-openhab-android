@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.openhab.habdroid.R
-import org.openhab.habdroid.core.connection.DemoConnection
 import org.openhab.habdroid.databinding.ActivityItemPickerBinding
 import org.openhab.habdroid.databinding.BottomSheetItemPickerCommandBinding
 import org.openhab.habdroid.databinding.BottomSheetSelectionItemRadioButtonBinding
@@ -208,20 +207,6 @@ abstract class AbstractItemPickerActivity :
                 return@launch
             }
 
-            if (connection is DemoConnection) {
-                showSnackbar(
-                    SNACKBAR_TAG_DEMO_MODE_ACTIVE,
-                    R.string.info_demo_mode_short,
-                    Snackbar.LENGTH_INDEFINITE,
-                    R.string.turn_off
-                ) {
-                    getPrefs().edit {
-                        putBoolean(PrefKeys.DEMO_MODE, false)
-                    }
-                    loadItems()
-                }
-            }
-
             try {
                 var items = ItemClient.loadItems(connection)
                 if (items == null) {
@@ -290,8 +275,6 @@ abstract class AbstractItemPickerActivity :
     data class CommandEntry(val command: String?, val label: String, val tag: String? = null) : Parcelable
 
     companion object {
-        private const val SNACKBAR_TAG_DEMO_MODE_ACTIVE = "demoModeActive"
-
         private val TAG = AbstractItemPickerActivity::class.java.simpleName
     }
 

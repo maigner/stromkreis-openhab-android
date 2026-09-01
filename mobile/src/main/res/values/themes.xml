@@ -81,6 +81,13 @@
         <item name="android:windowBackground">@color/black</item>
     </style>
 
+    <style name="openHAB.Onboarding" parent="openHAB.Base">
+        <item name="android:statusBarColor">@color/stromkreis_green_dark</item>
+        <item name="android:navigationBarColor">@color/stromkreis_green_light</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <item name="android:windowBackground">@drawable/bg_onboarding_gradient</item>
+    </style>
+
     <style name="openHAB.Launch" parent="openHAB.Base">
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <item name="colorPrimaryDark">@android:color/background_light</item>

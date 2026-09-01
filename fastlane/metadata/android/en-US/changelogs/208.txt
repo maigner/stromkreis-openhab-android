@@ -1,2 +1,0 @@
-## Fixed
-* Fix lock screen crash in WriteTagActivity (#1610)

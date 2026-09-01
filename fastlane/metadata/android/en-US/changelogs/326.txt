@@ -1,3 +1,0 @@
-## Added
-* Suggest to visit status.openhab.org if there's an issue with myopenhab (#2170)
-* Use Item tags for tile icon suggestion (#2194)

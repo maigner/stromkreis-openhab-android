@@ -1,2 +1,0 @@
-## Fixed
-* Fix slider crash (#2265)

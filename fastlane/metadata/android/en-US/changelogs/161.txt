@@ -1,3 +1,0 @@
-## Fixed
-* Make sure that intro is shown again if app is stopped (#1454)
-* Correctly handle SSE events without item. (#1466)

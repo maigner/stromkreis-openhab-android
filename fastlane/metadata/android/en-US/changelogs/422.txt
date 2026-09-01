@@ -1,2 +1,0 @@
-## Added
-* Make log searchable (#2846)

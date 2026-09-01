@@ -5,19 +5,17 @@
     <PreferenceCategory
         android:title="@string/settings_connection_title"
         android:key="connection">
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:disableDependentsState="true"
-            android:key="default_openhab_demomode"
-            android:summary="@string/settings_openhab_demomode_summary"
-            android:title="@string/settings_openhab_demomode"
-            android:widgetLayout="@layout/preference_material_switch"
+        <Preference
+            android:key="stromkreis_setup"
+            android:title="@string/settings_stromkreis_setup"
+            android:summary="@string/settings_stromkreis_setup_summary"
+            android:icon="@drawable/ic_qr_code_scanner_grey_24dp"
+            android:persistent="false"
             app:singleLineTitle="false"
             android:order="0" />
         <Preference
             android:key="add_server"
             android:title="@string/settings_add_server"
-            android:dependency="default_openhab_demomode"
             app:singleLineTitle="false"
             android:order="999" />
     </PreferenceCategory>
@@ -169,7 +167,6 @@
             app:singleLineTitle="false" />
         <Preference
             android:key="send_device_info"
-            android:dependency="default_openhab_demomode"
             android:title="@string/send_device_info_to_server"
             android:icon="@drawable/ic_cloud_upload_outline_grey_24dp"
             android:persistent="false"

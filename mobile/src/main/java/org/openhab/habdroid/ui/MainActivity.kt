@@ -92,11 +92,11 @@ import org.openhab.habdroid.background.PeriodicItemUpdateWorker
 import org.openhab.habdroid.core.CloudMessagingHelper
 import org.openhab.habdroid.core.NotificationHelper
 import org.openhab.habdroid.core.OpenHabApplication
+import org.openhab.habdroid.core.StromkreisSetup
 import org.openhab.habdroid.core.UpdateBroadcastReceiver
 import org.openhab.habdroid.core.connection.Connection
 import org.openhab.habdroid.core.connection.ConnectionFactory
 import org.openhab.habdroid.core.connection.ConnectionNotInitializedException
-import org.openhab.habdroid.core.connection.DemoConnection
 import org.openhab.habdroid.core.connection.NetworkNotAvailableException
 import org.openhab.habdroid.core.connection.NoUrlInformationException
 import org.openhab.habdroid.core.connection.WrongWifiException
@@ -291,9 +291,14 @@ class MainActivity : AbstractBaseActivity() {
             prefs.getBoolean(PrefKeys.RECENTLY_RESTORED, false)
         ) {
             NotificationUpdateObserver.createNotificationChannels(this)
-            Log.d(TAG, "Start intro")
-            val intent = Intent(this, IntroActivity::class.java)
-            startActivity(intent)
+            prefs.edit {
+                putBoolean(PrefKeys.FIRST_START, false)
+                putBoolean(PrefKeys.RECENTLY_RESTORED, false)
+            }
+        }
+        if (!StromkreisSetup.isActiveServerConfigured(prefs, getSecretPrefs())) {
+            Log.d(TAG, "No Stromkreis Cloud login configured, starting onboarding")
+            startActivity(Intent(this, OnboardingActivity::class.java))
         }
         UpdateBroadcastReceiver.updateComparableVersion(prefs.edit())
 
@@ -596,7 +601,6 @@ class MainActivity : AbstractBaseActivity() {
         connection = newConnection
         hideSnackbar(SNACKBAR_TAG_CONNECTION_ESTABLISHED)
         hideSnackbar(SNACKBAR_TAG_SSE_ERROR)
-        hideSnackbar(SNACKBAR_TAG_DEMO_MODE_ACTIVE)
         serverProperties = null
         handlePendingAction()
 
@@ -635,7 +639,7 @@ class MainActivity : AbstractBaseActivity() {
                     }
                 } else {
                     val officialServer = !failureReason.wouldHaveUsedLocalConnection() &&
-                        prefs.getRemoteUrl().matches("^(home.)?myopenhab.org$".toRegex())
+                        StromkreisSetup.isCloudHost(prefs.getRemoteUrl().toHttpUrlOrNull()?.host)
                     controller.indicateMissingConfiguration(false, officialServer)
                 }
             }
@@ -779,33 +783,21 @@ class MainActivity : AbstractBaseActivity() {
     }
 
     private fun handleConnectionChange() {
-        if (connection is DemoConnection) {
+        val activeInfo = getConnectionFactory().currentActive
+        val hasLocalAndRemote = activeInfo?.hasLocal == true && activeInfo.hasRemote
+        val type = connection?.connectionType
+        if (hasLocalAndRemote && type == Connection.TYPE_LOCAL) {
             showSnackbar(
-                SNACKBAR_TAG_DEMO_MODE_ACTIVE,
-                R.string.info_demo_mode_short,
-                actionResId = R.string.turn_off
-            ) {
-                prefs.edit {
-                    putBoolean(PrefKeys.DEMO_MODE, false)
-                }
-            }
-        } else {
-            val activeInfo = getConnectionFactory().currentActive
-            val hasLocalAndRemote = activeInfo?.hasLocal == true && activeInfo.hasRemote
-            val type = connection?.connectionType
-            if (hasLocalAndRemote && type == Connection.TYPE_LOCAL) {
-                showSnackbar(
-                    SNACKBAR_TAG_CONNECTION_ESTABLISHED,
-                    R.string.info_conn_url,
-                    Snackbar.LENGTH_SHORT
-                )
-            } else if (hasLocalAndRemote && type == Connection.TYPE_REMOTE) {
-                showSnackbar(
-                    SNACKBAR_TAG_CONNECTION_ESTABLISHED,
-                    R.string.info_conn_rem_url,
-                    Snackbar.LENGTH_SHORT
-                )
-            }
+                SNACKBAR_TAG_CONNECTION_ESTABLISHED,
+                R.string.info_conn_url,
+                Snackbar.LENGTH_SHORT
+            )
+        } else if (hasLocalAndRemote && type == Connection.TYPE_REMOTE) {
+            showSnackbar(
+                SNACKBAR_TAG_CONNECTION_ESTABLISHED,
+                R.string.info_conn_rem_url,
+                Snackbar.LENGTH_SHORT
+            )
         }
         queryServerProperties()
     }
@@ -855,10 +847,8 @@ class MainActivity : AbstractBaseActivity() {
                         chooseSitemap()
                         updateSitemapDrawerEntries()
                     }
-                    if (connection !is DemoConnection) {
-                        prefs.edit {
-                            putInt(PrefKeys.PREV_SERVER_FLAGS, result.props.flags)
-                        }
+                    prefs.edit {
+                        putInt(PrefKeys.PREV_SERVER_FLAGS, result.props.flags)
                     }
                     handlePendingAction()
                 }
@@ -1124,14 +1114,10 @@ class MainActivity : AbstractBaseActivity() {
             .forEach { item -> drawerMenu.removeItem(item.itemId) }
 
         // Add new items
-        if (connection is DemoConnection) {
-            drawerHeaderBinding.drawerModeSwitcher.isGone = true
-        } else {
-            val configs = prefs.getConfiguredServerIds()
-                .mapNotNull { id -> ServerConfiguration.load(prefs, getSecretPrefs(), id) }
-            configs.forEachIndexed { index, config -> drawerMenu.add(R.id.servers, config.id, index, config.name) }
-            drawerHeaderBinding.drawerModeSwitcher.isGone = configs.size <= 1
-        }
+        val configs = prefs.getConfiguredServerIds()
+            .mapNotNull { id -> ServerConfiguration.load(prefs, getSecretPrefs(), id) }
+        configs.forEachIndexed { index, config -> drawerMenu.add(R.id.servers, config.id, index, config.name) }
+        drawerHeaderBinding.drawerModeSwitcher.isGone = configs.size <= 1
         drawerHeaderBinding.serverNameLabel.isGone = drawerHeaderBinding.drawerModeSwitcher.isGone
         drawerHeaderBinding.serverSelector.isClickable = drawerHeaderBinding.drawerModeSwitcher.isVisible
         if (!drawerHeaderBinding.serverSelector.isClickable) {
@@ -1178,12 +1164,8 @@ class MainActivity : AbstractBaseActivity() {
     }
 
     private fun updateServerNameInDrawer() {
-        if (connection is DemoConnection) {
-            drawerHeaderBinding.serverName.text = getString(R.string.settings_openhab_demomode)
-        } else {
-            val activeConfig = ServerConfiguration.load(prefs, getSecretPrefs(), prefs.getActiveServerId())
-            drawerHeaderBinding.serverName.text = activeConfig?.name
-        }
+        val activeConfig = ServerConfiguration.load(prefs, getSecretPrefs(), prefs.getActiveServerId())
+        drawerHeaderBinding.serverName.text = activeConfig?.name
     }
 
     private fun updateDrawerItemVisibility() {
@@ -1766,7 +1748,6 @@ class MainActivity : AbstractBaseActivity() {
         const val EXTRA_UI_COMMAND = "uiCommand"
         const val EXTRA_CLOUD_NOTIFICATION_ID = "cloudNotificationId"
 
-        const val SNACKBAR_TAG_DEMO_MODE_ACTIVE = "demoModeActive"
         const val SNACKBAR_TAG_PRESS_AGAIN_EXIT = "pressAgainToExit"
         const val SNACKBAR_TAG_CONNECTION_ESTABLISHED = "connectionEstablished"
         const val SNACKBAR_TAG_PUSH_NOTIFICATION_FAIL = "pushNotificationFail"

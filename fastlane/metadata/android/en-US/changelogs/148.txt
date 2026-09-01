@@ -1,2 +1,0 @@
-## Fixed
-* Fix race conditions in ConnectionFactory state updating. (#1417)

@@ -1,3 +1,0 @@
-## Fixed
-* Make beautifyUrl() null safe (#1021)
-* Change link to privacy policy (#1024)

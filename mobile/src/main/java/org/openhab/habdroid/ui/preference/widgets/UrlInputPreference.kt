@@ -28,6 +28,7 @@ import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.openhab.habdroid.R
+import org.openhab.habdroid.core.StromkreisSetup
 import org.openhab.habdroid.databinding.TextInputPrefDialogBinding
 
 class UrlInputPreference(context: Context, attrs: AttributeSet) : CustomInputTypePreference(context, attrs) {
@@ -68,7 +69,7 @@ class UrlInputPreference(context: Context, attrs: AttributeSet) : CustomInputTyp
                 }
 
                 val suggestions = if (requireArguments().getBoolean(IS_FOR_REMOTE_SERVER, false)) {
-                    listOf("https://myopenhab.org", "https://")
+                    listOf(StromkreisSetup.DEFAULT_CLOUD_URL, "https://")
                 } else {
                     listOf("https://", "http://")
                 }
@@ -127,7 +128,6 @@ class UrlInputPreference(context: Context, attrs: AttributeSet) : CustomInputTyp
             val errorRes = when {
                 !urlIsValid -> if (isForRemoteServer) R.string.error_invalid_https_url else R.string.error_invalid_url
                 portSeemsInvalid -> R.string.error_port_seems_invalid
-                url?.host == "home.myopenhab.org" -> R.string.error_home_myopenhab_org_no_notifications
                 else -> 0
             }
 

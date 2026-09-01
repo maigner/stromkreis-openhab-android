@@ -1,2 +1,0 @@
-## Changed
-* Retry background item updates in a few more cases (#2180)

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_onboarding_gradient"
+    android:fitsSystemWindows="true">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="40dp"
+            android:paddingBottom="24dp">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:src="@drawable/ic_stromkreis_mark_96dp"
+                android:contentDescription="@string/stromkreis" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="@string/onboarding_title"
+                android:textColor="@android:color/white"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:alpha="0.9"
+                android:gravity="center"
+                android:text="@string/onboarding_subtitle"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <!-- QR code scanner -->
+            <LinearLayout
+                android:id="@+id/scanner_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_onboarding_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <FrameLayout
+                    android:id="@+id/scanner_frame"
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:background="@drawable/bg_onboarding_scanner_clip">
+
+                    <androidx.camera.view.PreviewView
+                        android:id="@+id/camera_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:implementationMode="compatible"
+                        app:scaleType="fillCenter" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="28dp"
+                        android:background="@drawable/bg_onboarding_scanner_border" />
+
+                    <TextView
+                        android:id="@+id/scanner_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="16dp"
+                        android:background="@drawable/bg_onboarding_scanner_message"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:visibility="gone"
+                        tools:text="@string/onboarding_camera_denied"
+                        tools:visibility="visible" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/scanner_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.85"
+                    android:gravity="center"
+                    android:text="@string/onboarding_scanner_hint"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Paste the setup link -->
+            <LinearLayout
+                android:id="@+id/paste_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_onboarding_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/onboarding_link_title"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:alpha="0.85"
+                    android:text="@string/onboarding_link_description"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/link_field"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_onboarding_input"
+                        android:hint="@string/onboarding_link_hint"
+                        android:imeOptions="actionGo"
+                        android:importantForAutofill="no"
+                        android:inputType="textUri"
+                        android:maxLines="1"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:textColor="@color/stromkreis_green_dark"
+                        android:textColorHint="#8A000000"
+                        android:textSize="14sp" />
+
+                    <ImageButton
+                        android:id="@+id/connect_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/onboarding_connect"
+                        android:src="@drawable/ic_arrow_circle_right_white_36dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Progress / result -->
+            <LinearLayout
+                android:id="@+id/status_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_onboarding_card"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ProgressBar
+                    android:id="@+id/status_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTint="@android:color/white" />
+
+                <ImageView
+                    android:id="@+id/status_icon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/ic_check_circle_white_48dp"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/status_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="Verbunden mit Haus Mustermann"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/status_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp"
+                    tools:text="@string/onboarding_ready" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/continue_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/onboarding_continue"
+                    android:textColor="@color/stromkreis_green_dark"
+                    android:visibility="gone"
+                    app:backgroundTint="@android:color/white"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/retry_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/try_again_button"
+                    android:textColor="@color/stromkreis_green_dark"
+                    android:visibility="gone"
+                    app:backgroundTint="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/onboarding_close"
+        android:src="@drawable/ic_close_white_24dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</FrameLayout>

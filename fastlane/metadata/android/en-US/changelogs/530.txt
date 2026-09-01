@@ -1,2 +1,0 @@
-- Show charts for all Sitemap widgets (via long-press menu) 
-- Support new Slider parameter: releaseOnly 

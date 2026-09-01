@@ -1,2 +1,0 @@
-## Changed
-* Improve HABPanel viewer (#1172) 

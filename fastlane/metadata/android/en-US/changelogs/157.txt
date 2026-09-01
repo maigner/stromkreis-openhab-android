@@ -1,3 +1,0 @@
-## Changed
-* Code changes that require to re-create all Tasker rules with the openHAB action binding (#1455)
-* Update translations (#1441)

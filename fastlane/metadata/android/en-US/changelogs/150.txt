@@ -1,3 +1,0 @@
-## Changed
-* Retry background item updates more often (#1401)
-* Improve command suggestions (#1405)

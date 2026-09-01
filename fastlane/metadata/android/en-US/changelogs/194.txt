@@ -1,3 +1,0 @@
-## Fixed
-* Hide version and icon in used libs (#1555)
-* Prune work when disabling item update pref (#1557)

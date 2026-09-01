@@ -1,2 +1,0 @@
-## Changed
-* Use Settings Panel to enable NFC in WriteTagActivity (#1516)

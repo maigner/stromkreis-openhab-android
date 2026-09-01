@@ -1,2 +1,0 @@
-## Fixed
-* Allow user added CAs (#1187)

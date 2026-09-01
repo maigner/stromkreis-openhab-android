@@ -1,3 +1,0 @@
-- Support Sitemap widget Buttongrid
-- Support material, iconify and f7 icons
-

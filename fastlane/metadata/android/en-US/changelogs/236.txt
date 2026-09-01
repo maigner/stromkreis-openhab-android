@@ -1,2 +1,0 @@
-## Fixed
-* Do SSL Client auth in webview using the certificate configured for the openHAB server (#1741)

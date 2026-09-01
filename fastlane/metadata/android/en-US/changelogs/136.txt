@@ -1,2 +1,0 @@
-## Fixed
-* Improve location parsing (#1345)

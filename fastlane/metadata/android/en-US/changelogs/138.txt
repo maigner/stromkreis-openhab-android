@@ -1,2 +1,0 @@
-## Fixed
-* Open links with target="_blank" in system browser

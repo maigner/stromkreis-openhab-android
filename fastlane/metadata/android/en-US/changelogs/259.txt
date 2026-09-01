@@ -1,2 +1,0 @@
-## Fixed
-* Be lenient about binding sockets to a given network (#1818)

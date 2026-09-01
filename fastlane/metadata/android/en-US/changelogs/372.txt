@@ -1,2 +1,0 @@
-## Fixed 
-* Fix opening URLs in main UI (#2518)

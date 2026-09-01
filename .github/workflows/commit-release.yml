@@ -38,23 +38,12 @@ jobs:
           echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
           echo "TAG_NAME=$TAG_NAME"         >> $GITHUB_ENV
 
-      - name: Build store description
-        run: |
-          if $(echo "$GITHUB_REF" | grep -q "beta")
-          then
-              echo "Build store description for beta version on F-Droid"
-              python3 assets/store_descriptions/generate_and_validate.py fdroidBeta
-          else
-              echo "Build store description for stable version on F-Droid"
-              python3 assets/store_descriptions/generate_and_validate.py fdroid
-          fi
-
       - name: Download release notes
         run: |
           echo "Get release notes for version code ${{ env.VERSION_CODE }}"
 
           retryCount=0
-          until curl https://api.github.com/repos/openhab/openhab-android/releases | jq -r '.[0].body' > fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt
+          until curl https://api.github.com/repos/maigner/stromkreis-openhab-android/releases | jq -r '.[0].body' > fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE }}.txt
           do
               let retryCount++
               if [ "$retryCount" -gt 20 ]

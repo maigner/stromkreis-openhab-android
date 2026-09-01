@@ -1,2 +1,0 @@
-## Added
-* Support bluetooth tethering (#1828)

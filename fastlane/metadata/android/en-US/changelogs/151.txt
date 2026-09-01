@@ -1,3 +1,0 @@
-## Changed
-* Update license to EPL-2.0 (#1385)
-* Bump dependencies

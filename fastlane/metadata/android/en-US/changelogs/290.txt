@@ -1,3 +1,0 @@
-• Send Wi-Fi name, battery level, charging state and DND state to server
-• Support system-wide data saver setting and add a setting to turn it on app-wide
-• New color picker for Color items

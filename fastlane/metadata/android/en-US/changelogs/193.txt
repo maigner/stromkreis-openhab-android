@@ -1,2 +1,0 @@
-## Fixed
-* Ignore alarm clocks set by Tasker (#1551)

@@ -36,7 +36,7 @@ android {
     namespace "org.openhab.habdroid"
 
     defaultConfig {
-        applicationId "org.openhab.habdroid"
+        applicationId "net.stromkreis.app"
         minSdkVersion 21
         compileSdk 35
         targetSdkVersion 35
@@ -107,7 +107,11 @@ android {
         lintConfig file("lint.xml")
     }
 
-    androidResources { generateLocaleConfig true }
+    androidResources {
+        generateLocaleConfig true
+        // The Stromkreis app is German-only
+        localeFilters += ["de"]
+    }
 
     buildFeatures {
         buildConfig true
@@ -171,7 +175,13 @@ dependencies {
 
     implementation libs.colorpicker
     implementation libs.androidsvg
-    implementation libs.appintro
+
+    // Stromkreis onboarding: QR code scanner
+    implementation libs.camera.core
+    implementation libs.camera.camera2
+    implementation libs.camera.lifecycle
+    implementation libs.camera.view
+    implementation libs.zxing.core
     implementation libs.photoview
     implementation libs.skeletonlayout
 

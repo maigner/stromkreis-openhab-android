@@ -1,2 +1,0 @@
-## Added
-* Auto retry after connection failed (#1781)

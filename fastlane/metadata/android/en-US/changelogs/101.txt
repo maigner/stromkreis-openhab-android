@@ -1,2 +1,0 @@
-## Added
-* Display HABPanel (#1124)

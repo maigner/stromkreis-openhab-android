@@ -1,3 +1,0 @@
-• Write NFC tags for Item
-• Support Android 10 dark mode
-• Fix lock screen on Android 10

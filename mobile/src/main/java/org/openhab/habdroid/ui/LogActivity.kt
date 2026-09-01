@@ -212,7 +212,7 @@ class LogActivity :
             .forEach { config ->
                 val toRedactableHost = { url: String? ->
                     url?.toHttpUrlOrNull()?.host
-                        ?.takeIf { it.isNotEmpty() && !HttpClient.isMyOpenhab(it) }
+                        ?.takeIf { it.isNotEmpty() && !HttpClient.isStromkreisCloud(it) }
                 }
                 toRedactableHost(config.localPath?.url)?.let {
                     redactions[it] = "<openhab-local-address-${config.name}>"

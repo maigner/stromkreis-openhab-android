@@ -41,7 +41,6 @@ import org.openhab.habdroid.util.PrefKeys
 import org.openhab.habdroid.util.getActiveServerId
 import org.openhab.habdroid.util.getPrefs
 import org.openhab.habdroid.util.getStringOrNull
-import org.openhab.habdroid.util.isDemoModeEnabled
 import org.openhab.habdroid.util.openInBrowser
 
 open class ConnectionWebViewClient(val connection: Connection) : WebViewClient() {
@@ -108,11 +107,6 @@ open class ConnectionWebViewClient(val connection: Connection) : WebViewClient()
     override fun onReceivedClientCertRequest(view: WebView, request: ClientCertRequest) {
         Log.d(TAG, "SSL Client Cert required")
         val prefs = view.context.getPrefs()
-        if (prefs.isDemoModeEnabled()) {
-            request.cancel()
-            return
-        }
-
         val serverId = prefs.getActiveServerId()
         val alias = prefs.getStringOrNull(PrefKeys.buildServerKey(serverId, PrefKeys.SSL_CLIENT_CERT_PREFIX))
         Log.d(TAG, "Using alias $alias")

@@ -1,2 +1,0 @@
-## Fixed
-* Show widget value for section switches. (#939)

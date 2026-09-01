@@ -1,3 +1,0 @@
-## Fixed
-* Fix permission request for 'Send ssid' (#2436)
-* Reduce data access warnings (#2435)

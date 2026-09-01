@@ -1,70 +1,66 @@
 <p align="center">
-    <a href="https://github.com/openhab/openhab-android/actions?query=workflow%3A%22Build+App%22"><img alt="GitHub Action" src="https://github.com/openhab/openhab-android/workflows/Build%20App/badge.svg"></a>
-    <a href="https://crowdin.com/project/openhab-android"><img alt="Crowdin" src="https://d322cqt584bo4o.cloudfront.net/openhab-android/localized.svg"></a>
-    <br>
     <img alt="Logo" src="fastlane/metadata/android/en-US/images/icon.png" width="100">
     <br>
-    <b>openHAB client for Android</b>
+    <b>Stromkreis client for Android</b>
 </p>
 
 ## Introduction
 
-This app is a native client for openHAB which allows easy access to your sitemaps.
-The documentation is available at [www.openhab.org/docs/](https://www.openhab.org/docs/apps/android.html).
+This is the native Android app for [Stromkreis](https://stromkreis.net), the open platform by energy communities
+for energy communities. It connects members of an Austrian energy community (EEG) to their Stromkreis gateway at home
+and, from anywhere, to the Stromkreis Cloud (`https://hac.stromkreis.net`).
 
-<a href="https://play.google.com/store/apps/details?id=org.openhab.habdroid"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Get it on Play Store" height="80"></a>
-<a href="https://f-droid.org/app/org.openhab.habdroid"><img src="docs/images/get-it-on-fdroid.png" alt="Get it on F-Droid" height="80"></a>
-<a href="https://github.com/openhab/openhab-android/releases"><img src="assets/direct-apk-download.png" alt="Get it on GitHub" height="80"></a>
+The Stromkreis gateway runs on [openHAB](https://www.openhab.org); this app is a fork of the
+[openHAB Android client](https://github.com/openhab/openhab-android) (EPL-2.0). Throughout the rest of this document
+"openHAB server" refers to the openHAB instance on your Stromkreis gateway. The iOS counterpart lives at
+[maigner/stromkreis-openhab-ios](https://github.com/maigner/stromkreis-openhab-ios).
+
+The app is German-only (`de` is the default and only resource locale).
+
+## Setup for members
+
+There is no demo mode. Until the active server has a Stromkreis Cloud login the app shows the onboarding screen:
+scan the one-time QR code from your Stromkreis page, paste the setup link, or simply open the
+`https://stromkreis.net/app/setup/<token>` link on the phone. The setup can be repeated later via
+*Settings → Stromkreis-Einrichtungscode scannen*. See [docs/stromkreis-onboarding.md](docs/stromkreis-onboarding.md)
+for the accepted link formats and the server contract.
 
 ## Features
-* Control your openHAB server and/or [openHAB Cloud instance](https://github.com/openhab/openhab-cloud), e.g., an account with [myopenHAB](http://www.myopenhab.org/)
-* Receive notifications through an openHAB Cloud connection, [read more](https://www.openhab.org/docs/configuration/actions.html#cloud-notification-actions)
+* Control your Stromkreis gateway locally and through the Stromkreis Cloud (an [openHAB Cloud](https://github.com/openhab/openhab-cloud) instance)
+* Receive notifications through the Stromkreis Cloud connection
 * Change items via NFC tags
-* Send voice commands to openHAB
-* [Send alarm clock time to openHAB](https://www.openhab.org/docs/apps/android.html#alarm-clock)
-* [Supports wall mounted tablets](https://www.openhab.org/docs/apps/android.html#permanent-deployment)
+* Send voice commands
+* Send alarm clock time and other device information to the gateway
+* Supports wall mounted tablets
 * [Tasker](https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm) action plugin included
-
-<img src="docs/images/main-menu.png" alt="Demo Overview" width=200px> <img src="docs/images/widget-overview.png" alt="Widget Overview" width=200px> <img src="docs/images/main-ui.png" alt="Main UI" width=200px>
-
-## Beta builds
-
-Beta builds are distributed via [GitHub](https://github.com/openhab/openhab-android/releases) and [F-Droid](https://f-droid.org/packages/org.openhab.habdroid.beta). Those builds can be installed alongside the stable version.
-
-On Google Play you can opt-in to get updates of stable versions before others: https://play.google.com/apps/testing/org.openhab.habdroid
-
-## Localization
-
-Concerning all `strings.xml` files at [mobile/src/\*/res/values-\*/](mobile/src/main/res/)
-
-All language/regional translations are managed with [Crowdin](https://crowdin.com/).
-Please do NOT contribute translations as pull requests against the `mobile/src/*/res/values-*/strings.xml` files directly, but submit them through the Crowdin web service:
-
-- [https://crowdin.com/project/openhab-android](https://crowdin.com/project/openhab-android)
-
-Thanks for your consideration and contribution!
 
 ## Setting up development environment
 
-If you want to contribute to Android application we are here to help you to set up development environment. openHAB client for Android is developed using Android Studio.
+The app is developed using Android Studio.
 
 - Download and install [Android Studio](https://developer.android.com/studio)
-- Check out the latest code from GitHub via Android Studio
+- Check out the code from GitHub via Android Studio
 - Install SDKs and Gradle if you get asked
 - Click on "Build Variants" on the left side and change the build variant of the module "mobile" to "fullStableDebug".
 
-You are ready to contribute!
+Command line: `./gradlew :mobile:assembleFullStableDebug` and `./gradlew :mobile:testFullStableDebugUnitTest`
+(JDK 17 and an Android SDK with platform 35 are required).
 
 Before producing any amount of code please have a look at [contribution guidelines](CONTRIBUTING.md)
 
 ## Build flavors
 
-An optional build flavor "foss" is available for distribution through F-Droid. This build has FCM and crash reporting removed and will not be able to receive push notifications from openHAB Cloud.
+An optional build flavor "foss" is available for distribution without Google services. This build has FCM and crash
+reporting removed and will not be able to receive push notifications from the Stromkreis Cloud; notifications are
+polled instead.
+
+Application IDs: `net.stromkreis.app` (stable) and `net.stromkreis.app.beta` (beta). Push notifications require a
+Firebase project that contains these application IDs; `mobile/google-services.json` has to be replaced accordingly.
 
 For using map view support in the "full" build flavor, you need to visit the [Maps API page](https://developers.google.com/maps/android) and generate an API key via the 'Get a key' button at the top. Then add a line in the following format to the 'gradle.properties' file (either in the same directory as this readme file, or in $HOME/.gradle): `mapsApiKey=<key>`, replacing `<key>` with the API key you just obtained.
 
 ## Trademark Disclaimer
 
-Product names, logos, brands and other trademarks referred to within the openHAB website are the property of their respective trademark holders. These trademark holders are not affiliated with openHAB or our website. They do not sponsor or endorse our materials.
-
-Google Play and the Google Play logo are trademarks of Google Inc.
+openHAB is a trademark of the openHAB Foundation e.V.; Stromkreis is not affiliated with or endorsed by it.
+Product names, logos, brands and other trademarks referred to within this repository are the property of their
+respective trademark holders. Google Play and the Google Play logo are trademarks of Google Inc.

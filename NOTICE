@@ -1,6 +1,10 @@
-This content is produced and maintained by the openHAB project.
+This content is produced and maintained by the Stromkreis project.
 
-* Project home: https://www.openhab.org
+* Project home: https://stromkreis.net
+
+It is a fork of the openHAB Android client, produced and maintained by the
+openHAB project (https://www.openhab.org). openHAB is a trademark of the
+openHAB Foundation e.V.; Stromkreis is not affiliated with or endorsed by it.
 
 == Declared Project Licenses
 
@@ -10,4 +14,6 @@ https://www.eclipse.org/legal/epl-2.0/.
 
 == Source Code
 
-https://github.com/openhab/openhab-android
+https://github.com/maigner/stromkreis-openhab-android
+
+Upstream: https://github.com/openhab/openhab-android

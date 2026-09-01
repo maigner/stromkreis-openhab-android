@@ -1,3 +1,0 @@
-## Fixed
-* Fix crashes (#1256, #1251, #1249)
-* Fix HABPanel not shown if using authentication (#1254)

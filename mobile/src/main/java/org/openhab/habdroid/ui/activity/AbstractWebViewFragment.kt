@@ -58,7 +58,6 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.openhab.habdroid.R
 import org.openhab.habdroid.core.connection.Connection
-import org.openhab.habdroid.core.connection.DemoConnection
 import org.openhab.habdroid.databinding.BottomSheetShortcutLabelBinding
 import org.openhab.habdroid.databinding.FragmentWebviewBinding
 import org.openhab.habdroid.model.ServerConfiguration
@@ -137,10 +136,7 @@ abstract class AbstractWebViewFragment :
         val prefs = context.getPrefs()
         val activeServerId = prefs.getActiveServerId()
         title = context.getString(titleRes)
-        if (
-            prefs.getConfiguredServerIds().size > 1 &&
-            context.getConnectionFactory().currentActive?.conn?.connection !is DemoConnection
-        ) {
+        if (prefs.getConfiguredServerIds().size > 1) {
             val activeServerName = ServerConfiguration.load(prefs, context.getSecretPrefs(), activeServerId)?.name
             title = getString(R.string.ui_on_server, title, activeServerName)
         }

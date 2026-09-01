@@ -1,3 +1,0 @@
-## Added
-* Support MapView in foss flavor (#1358)
-* Add ability to create sitemap shortcuts (#1357)

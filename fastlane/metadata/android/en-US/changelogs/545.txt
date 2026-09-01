@@ -1,4 +1,0 @@
-- Implement new notification features
-- Support buttongrid's button widgets
-- Support press and release for switch widgets
-- This version is the last one with support for openHAB 1

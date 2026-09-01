@@ -1,5 +1,0 @@
-## Fixed
-* Correctly disable 'ok' button if alarm item is empty (#1476)
-
-## Changed
-* Bump dependencies

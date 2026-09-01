@@ -1,5 +1,0 @@
-## Added
-* Add long press behavior for color widgets (#2164)
-
-## Fixed
-* Show image loading indicator if present (#2181)
