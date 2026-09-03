@@ -43,8 +43,6 @@ import android.text.style.RelativeSizeSpan;
 import android.util.SparseArray;
 
 import org.openhab.habdroid.R;
-import org.openhab.habdroid.background.NotificationUpdateObserver;
-import org.openhab.habdroid.util.ExtensionFuncsKt;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,6 +92,7 @@ public class MemorizingTrustManager implements X509TrustManager {
     private final static Logger LOGGER = Logger.getLogger(MemorizingTrustManager.class.getName());
     final static String DECISION_TITLE_ID      = DECISION_INTENT + ".titleId";
     private final static int NOTIFICATION_ID = 100509;
+    private final static String NOTIFICATION_CHANNEL_ID = "certificateErrors";
 
     static String KEYSTORE_DIR = "KeyStore";
     static String KEYSTORE_FILE = "KeyStore.bks";
@@ -624,7 +623,7 @@ public class MemorizingTrustManager implements X509TrustManager {
             master,
             0,
             intent,
-            ExtensionFuncsKt.getPendingIntent_Immutable()
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0
         );
         final String mtmNotification = master.getString(R.string.mtm_notification);
         final long currentMillis = System.currentTimeMillis();
@@ -640,8 +639,10 @@ public class MemorizingTrustManager implements X509TrustManager {
             .setAutoCancel(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationUpdateObserver.createNotificationChannels(context);
-            notification.setChannelId(NotificationUpdateObserver.CHANNEL_ID_BACKGROUND_ERROR);
+            android.app.NotificationChannel channel = new android.app.NotificationChannel(
+                NOTIFICATION_CHANNEL_ID, mtmNotification, NotificationManager.IMPORTANCE_HIGH);
+            context.getSystemService(NotificationManager.class).createNotificationChannel(channel);
+            notification.setChannelId(NOTIFICATION_CHANNEL_ID);
         }
 
         notificationManager.notify(NOTIFICATION_ID + decisionId, notification.build());

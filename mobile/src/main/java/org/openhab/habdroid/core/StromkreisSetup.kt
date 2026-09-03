@@ -16,7 +16,6 @@ package org.openhab.habdroid.core
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import androidx.core.content.edit
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
@@ -33,8 +32,6 @@ import org.json.JSONObject
 import org.openhab.habdroid.R
 import org.openhab.habdroid.model.ServerConfiguration
 import org.openhab.habdroid.model.ServerPath
-import org.openhab.habdroid.ui.MainActivity
-import org.openhab.habdroid.util.PrefKeys
 import org.openhab.habdroid.util.getActiveServerId
 import org.openhab.habdroid.util.getNextAvailableServerId
 import org.openhab.habdroid.util.getPrefs
@@ -279,7 +276,7 @@ object StromkreisSetup {
 
     /**
      * Writes the credentials into the active server's remote (Stromkreis Cloud) connection, creating
-     * the server if none exists yet, and makes Main UI the start page.
+     * the server if none exists yet.
      */
     fun apply(context: Context, credentials: StromkreisCloudCredentials): ServerConfiguration {
         val prefs = context.getPrefs()
@@ -309,9 +306,6 @@ object StromkreisSetup {
             )
         }
         config.saveToPrefs(prefs, secretPrefs)
-        prefs.edit {
-            putString(PrefKeys.START_PAGE, MainActivity.ACTION_MAIN_UI_SELECTED)
-        }
         Log.i(TAG, "Stromkreis Cloud connection configured for server ${config.id}")
         return config
     }

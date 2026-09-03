@@ -245,8 +245,3 @@ data class ServerConfiguration(
 
 @Parcelize
 data class DefaultSitemap(val name: String, val label: String) : Parcelable
-
-fun String.toWifiSsids(): Set<String> = split("\n")
-    .map { ssid -> ssid.trim() }
-    .filter { it.isNotEmpty() }
-    .toSet()

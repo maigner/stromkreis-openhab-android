@@ -6,7 +6,6 @@ Features:
 * Forecast-driven battery management: charge the battery when it benefits the community
 * Remote access to the gateway from anywhere through the Stromkreis Cloud (https://hac.stromkreis.net)
 * Setup in seconds: scan the QR code from your Stromkreis page or open the setup link
-* Notifications, NFC tags, voice commands, quick settings tiles and a Tasker plugin
 * Native support for phones and tablets
 
 Stromkreis is non-profit and open source. Learn more at https://stromkreis.net

@@ -13,8 +13,6 @@
 
 package org.openhab.habdroid.util
 
-import android.os.Build
-import android.util.Log
 import java.util.Locale
 import org.openhab.habdroid.BuildConfig
 
@@ -23,19 +21,4 @@ object Util {
 
     val isFlavorStable get() = BuildConfig.FLAVOR.lowercase(Locale.ROOT).contains("stable")
     val isFlavorBeta get() = !isFlavorStable
-
-    fun isEmulator(): Boolean {
-        val isEmulator = Build.FINGERPRINT.startsWith("generic") ||
-            Build.FINGERPRINT.startsWith("unknown") ||
-            Build.MODEL.contains("google_sdk") ||
-            Build.MODEL.contains("Emulator") ||
-            Build.MODEL.contains("Android SDK built for x86") ||
-            Build.MODEL.contains("sdk_phone_armv7") ||
-            Build.MANUFACTURER.contains("Genymotion") ||
-            (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")) ||
-            Build.PRODUCT == "google_sdk" ||
-            Build.PRODUCT.startsWith("sdk_gphone")
-        Log.d(TAG, "Device is emulator: $isEmulator")
-        return isEmulator
-    }
 }

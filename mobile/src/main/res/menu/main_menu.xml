@@ -1,31 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/mainmenu_voice_recognition"
-        android:icon="@drawable/ic_microphone_outline_white_24dp"
+        android:id="@+id/mainmenu_reload"
+        android:icon="@drawable/ic_refresh_grey_24dp"
         android:orderInCategory="100"
-        android:title="@string/mainmenu_openhab_voice_recognition"
-        app:showAsAction="always"
-        app:iconTint="?android:textColorSecondary" />
+        android:title="@string/mainmenu_reload"
+        app:showAsAction="never" />
     <item
-        android:id="@+id/mainmenu_poll_notifications"
-        android:orderInCategory="1000"
-        android:title="Poll notifications"
-        app:showAsAction="never"
-        tools:ignore="HardcodedText" />
+        android:id="@+id/mainmenu_settings"
+        android:orderInCategory="200"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
     <item
-        android:id="@+id/mainmenu_debug_crash"
-        android:orderInCategory="1000"
-        android:title="Crash"
-        app:showAsAction="never"
-        tools:ignore="HardcodedText" />
-    <item
-        android:id="@+id/mainmenu_debug_clear_mtm"
-        android:orderInCategory="1001"
-        android:title="Clear MTM"
-        app:showAsAction="never"
-        tools:ignore="HardcodedText" />
+        android:id="@+id/mainmenu_about"
+        android:orderInCategory="300"
+        android:title="@string/about_title"
+        app:showAsAction="never" />
 </menu>

@@ -17,8 +17,8 @@ import android.app.Application
 import android.util.Log
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
+import org.acra.config.DialogConfigurationBuilder
 import org.acra.config.MailSenderConfigurationBuilder
-import org.acra.config.NotificationConfigurationBuilder
 import org.openhab.habdroid.BuildConfig
 import org.openhab.habdroid.R
 
@@ -39,17 +39,11 @@ object CrashReportingHelper {
         val builder = CoreConfigurationBuilder()
             .withBuildConfigClass(BuildConfig::class.java)
             .withPluginConfigurations(
-                NotificationConfigurationBuilder()
+                DialogConfigurationBuilder()
                     .withEnabled(true)
-                    .withResIcon(R.drawable.ic_openhab_appicon_white_24dp)
                     .withTitle(app.getString(R.string.crash_report_notification_title))
                     .withText(app.getString(R.string.crash_report_notification_text))
-                    .withSendButtonText(app.getString(R.string.crash_report_notification_send_mail))
-                    .withResSendButtonIcon(0)
-                    .withResDiscardButtonIcon(0)
-                    .withChannelName(app.getString(R.string.notification_channel_crash_reports))
-                    .withChannelDescription(app.getString(R.string.notification_channel_crash_reports_description))
-                    .withSendOnClick(false)
+                    .withPositiveButtonText(app.getString(R.string.crash_report_notification_send_mail))
                     .build(),
                 MailSenderConfigurationBuilder()
                     .withEnabled(true)
@@ -62,8 +56,6 @@ object CrashReportingHelper {
 
     fun isCrashReporterProcess() = ACRA.isACRASenderServiceProcess()
 
-    fun canBeDisabledByUser() = false
-
     fun d(tag: String, message: String, remoteOnly: Boolean = false, exception: Exception? = null) {
         if (!remoteOnly) {
             Log.d(tag, message, exception)
@@ -74,9 +66,5 @@ object CrashReportingHelper {
         if (!remoteOnly) {
             Log.e(tag, message, exception)
         }
-    }
-
-    fun nonFatal(@Suppress("UNUSED_PARAMETER") e: Throwable) {
-        // no-op
     }
 }

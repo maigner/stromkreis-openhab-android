@@ -94,11 +94,10 @@ fingerprints. `stromkreis://` links work immediately without server support, whi
   found" screen offers *Einrichtungscode scannen*.
 - Re-run setup later: Settings → *Stromkreis-Einrichtungscode scannen*.
 - Credentials are written to the active server's remote connection (username/password in the
-  encrypted preferences); the server is created if none exists, named after `siteName`. The start
-  page is set to Main UI. The remote URL defaults to `https://hac.stromkreis.net` in the settings UI.
+  encrypted preferences); the server is created if none exists, named after `siteName`. After the
+  setup, `MainActivity` always shows the Main UI - it is the only content screen of the app.
 
 ## Notifications
 
-The app contains no Google services, so there is no push. The current data is fetched from the
-Stromkreis Cloud whenever the app is opened; cloud notifications can optionally be polled
-periodically (Settings → Benachrichtigungen, off by default).
+The app contains no Google services, so there is no push and no notification handling at all.
+The current data is fetched from the Stromkreis Cloud whenever the app is opened.

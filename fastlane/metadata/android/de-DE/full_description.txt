@@ -6,7 +6,6 @@ Funktionen:
 * Prognosegesteuertes Batteriemanagement: Speicher laden, wenn es der Gemeinschaft nützt
 * Fernzugriff auf das Gateway von unterwegs über die Stromkreis-Cloud (https://hac.stromkreis.net)
 * Einrichtung in Sekunden: QR-Code von der Stromkreis-Seite scannen oder Einrichtungslink öffnen
-* Benachrichtigungen, NFC-Tags, Sprachbefehle, Kacheln in den Schnelleinstellungen und Tasker-Plugin
 * Native Unterstützung für Smartphones und Tablets
 
 Stromkreis ist gemeinnützig und quelloffen. Mehr unter https://stromkreis.net

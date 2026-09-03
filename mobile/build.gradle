@@ -10,7 +10,6 @@ buildscript {
     dependencies {
         classpath libs.unmock.plugin
         classpath libs.aboutlibraries.plugin
-        classpath libs.missing.metadata.guava.plugin
     }
 }
 
@@ -19,10 +18,8 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-parcelize"
 apply plugin: "de.mobilej.unmock"
 apply plugin: "com.mikepenz.aboutlibraries.plugin"
-apply plugin: "de.jjohannes.missing-metadata-guava"
 
 android {
-    useLibrary "org.apache.http.legacy"
     namespace "org.openhab.habdroid"
 
     defaultConfig {
@@ -33,7 +30,6 @@ android {
         versionCode 599
         versionName "3.21.1"
         multiDexEnabled true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.getenv("SOURCE_DATE_EPOCH") != null ? System.getenv("SOURCE_DATE_EPOCH").toLong() + "L" : System.currentTimeMillis() + "L"
     }
 
@@ -49,8 +45,8 @@ android {
         }
     }
 
-    // No Google services: notifications are polled from the Stromkreis Cloud, crash reports go via
-    // ACRA e-mail and map widgets use OpenStreetMap (osmdroid).
+    // The app is a thin client for the openHAB Main UI of the Stromkreis Cloud: no Google
+    // services, no sitemaps, no background tasks. Crash reports go via ACRA e-mail.
     flavorDimensions "release"
     productFlavors {
         stable { dimension "release" }
@@ -117,7 +113,6 @@ unMock {
 }
 
 repositories {
-    maven { url "https://maven.fabric.io/public" }
     mavenCentral()
     maven { url "https://jitpack.io" }
     google()
@@ -127,7 +122,6 @@ dependencies {
     coreLibraryDesugaring libs.desugar.jdk.libs
 
     implementation libs.kotlinx.coroutines.core
-    implementation libs.kotlinx.coroutines.jdk9
     implementation libs.kotlinx.coroutines.android
 
     implementation libs.core.ktx
@@ -137,29 +131,14 @@ dependencies {
 
     implementation libs.appcompat
     implementation libs.legacy.support.v4
-    implementation libs.recyclerview
-    implementation libs.constraintlayout
     implementation libs.preference.ktx
-    implementation libs.biometric
     implementation libs.material
     implementation libs.multidex
 
-    implementation libs.work.runtime.ktx
-
     implementation libs.security.crypto
-
-    implementation libs.media3.exoplayer
-    implementation libs.media3.ui
-    implementation libs.media3.exoplayer.hls
-
-    implementation libs.jmdns
 
     implementation libs.okhttp
     implementation libs.logging.interceptor
-    implementation libs.okhttp.sse
-
-    implementation libs.colorpicker
-    implementation libs.androidsvg
 
     // Stromkreis onboarding: QR code scanner
     implementation libs.camera.core
@@ -167,19 +146,21 @@ dependencies {
     implementation libs.camera.lifecycle
     implementation libs.camera.view
     implementation libs.zxing.core
-    implementation libs.photoview
-    implementation libs.skeletonlayout
-
-    implementation libs.osmdroid.android
+    // CameraX's ProcessCameraProvider exposes Guava's ListenableFuture
+    implementation libs.guava.listenablefuture
 
     implementation libs.material.about.library
     implementation libs.aboutlibraries.core
     implementation libs.aboutlibraries
 
-    implementation libs.androidchart
-
-    implementation libs.acra.mail
-    implementation libs.acra.notification
+    // ACRA leaks the auto-service annotation processor (and thereby Guava) into the runtime
+    // classpath, exclude it
+    implementation(libs.acra.mail) {
+        exclude group: "com.google.auto.service", module: "auto-service"
+    }
+    implementation(libs.acra.dialog) {
+        exclude group: "com.google.auto.service", module: "auto-service"
+    }
 
     testImplementation libs.mockito.core
     testImplementation libs.mockito.kotlin
@@ -187,17 +168,4 @@ dependencies {
     testImplementation libs.json
     testImplementation libs.mockwebserver
     testImplementation libs.kotlinx.coroutines.test
-
-    testImplementation libs.powermock.core
-    testImplementation libs.powermock.api.mockito2
-    testImplementation libs.powermock.module.junit4
-
-    androidTestImplementation(libs.espresso.core) {
-        exclude group: "com.android.support", module: "support-annotations"
-    }
-    androidTestImplementation libs.espresso.intents
-    androidTestImplementation(libs.espresso.contrib) {
-        exclude group: "com.android.support", module: "support-annotations"
-    }
-    androidTestImplementation libs.junit.ktx
 }

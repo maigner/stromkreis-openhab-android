@@ -26,13 +26,19 @@ scan the one-time QR code from your Stromkreis page, paste the setup link, or si
 for the accepted link formats and the server contract.
 
 ## Features
-* Control your Stromkreis gateway locally and through the Stromkreis Cloud (an [openHAB Cloud](https://github.com/openhab/openhab-cloud) instance)
-* Receive notifications through the Stromkreis Cloud connection
-* Change items via NFC tags
-* Send voice commands
-* Send alarm clock time and other device information to the gateway
-* Supports wall mounted tablets
-* [Tasker](https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm) action plugin included
+
+The app is deliberately minimal: it is a thin client for the openHAB Main UI of the Stromkreis
+gateway, reached through the Stromkreis Cloud (an
+[openHAB Cloud](https://github.com/openhab/openhab-cloud) instance).
+
+* One-time setup via QR code or setup link (see above)
+* Shows the gateway's Main UI (live view of PV system, battery and grid feed-in)
+* Supports wall mounted tablets (fullscreen mode, keep-screen-on option)
+* Crash reports as e-mail via ACRA (no tracking)
+
+Everything else from the upstream openHAB app (sitemaps, notifications, NFC, Tasker, voice
+commands, quick settings tiles, home screen widgets, day dream, device controls, maps, charts)
+has been removed.
 
 ## Setting up development environment
 
@@ -50,12 +56,12 @@ Before producing any amount of code please have a look at [contribution guidelin
 
 ## No Google services
 
-The app deliberately contains no Google services (what upstream calls the "foss" flavor is the only variant):
+The app deliberately contains no Google services:
 
-* no Firebase Cloud Messaging: the current data is fetched from the Stromkreis Cloud whenever the app is opened;
-  optionally, notifications can be polled periodically (Settings → Benachrichtigungen)
+* no Firebase Cloud Messaging: the current data is fetched from the Stromkreis Cloud whenever the app is opened
 * no Crashlytics: crash reports are offered as e-mail via ACRA
-* no Google Maps: map widgets use OpenStreetMap (osmdroid)
+
+The only permissions are INTERNET, ACCESS_NETWORK_STATE and CAMERA (QR code scanner).
 
 Application IDs: `net.stromkreis.app` (stable) and `net.stromkreis.app.beta` (beta). Both are fine for Google Play,
 F-Droid or direct APK distribution.

@@ -14,23 +14,11 @@
 package org.openhab.habdroid.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Build
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.RemoteViews
-import androidx.appcompat.widget.TooltipCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.net.toUri
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.openhab.habdroid.R
 import org.openhab.habdroid.core.connection.Connection
-import org.openhab.habdroid.util.openInBrowser
 import org.openhab.habdroid.util.resolveThemedColor
 
 /**
@@ -52,43 +40,4 @@ fun WebView.setUpForConnection(connection: Connection) {
     }
 
     webViewClient = ConnectionWebViewClient(connection)
-}
-
-fun ImageView.setupHelpIcon(url: String, contentDescriptionRes: Int) {
-    val contentDescription = context.getString(contentDescriptionRes)
-    this.contentDescription = contentDescription
-    TooltipCompat.setTooltipText(this, contentDescription)
-
-    setOnClickListener {
-        url.toUri().openInBrowser(context)
-    }
-}
-
-fun EditText.setKeyboardVisible(visible: Boolean) {
-    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    if (visible) {
-        imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-    } else {
-        imm.hideSoftInputFromWindow(windowToken, 0)
-    }
-}
-
-fun View.playPressAnimationAndCallBack(postAnimationCallback: () -> Unit) {
-    post {
-        if (background != null) {
-            val centerX = width / 2
-            val centerY = height / 2
-            DrawableCompat.setHotspot(background, centerX.toFloat(), centerY.toFloat())
-        }
-        isPressed = true
-        isPressed = false
-        postAnimationCallback()
-    }
-}
-
-fun RemoteViews.duplicate(): RemoteViews = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-    RemoteViews(this)
-} else {
-    @Suppress("DEPRECATION")
-    clone()
 }

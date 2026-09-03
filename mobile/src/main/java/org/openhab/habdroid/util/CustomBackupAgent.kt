@@ -15,7 +15,6 @@ package org.openhab.habdroid.util
 
 import android.app.backup.BackupAgentHelper
 import android.util.Log
-import androidx.core.content.edit
 
 // Used in manifest
 @Suppress("unused")
@@ -23,9 +22,6 @@ class CustomBackupAgent : BackupAgentHelper() {
     override fun onRestoreFinished() {
         super.onRestoreFinished()
         Log.d(TAG, "Restore finished")
-        getPrefs().edit {
-            putBoolean(PrefKeys.RECENTLY_RESTORED, true)
-        }
     }
 
     companion object {

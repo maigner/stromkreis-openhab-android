@@ -32,11 +32,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.openhab.habdroid.R
-import org.openhab.habdroid.core.OpenHabApplication
 import org.openhab.habdroid.databinding.ActivityLogBinding
 import org.openhab.habdroid.model.ServerConfiguration
 import org.openhab.habdroid.util.HttpClient
-import org.openhab.habdroid.util.determineDataUsagePolicy
 import org.openhab.habdroid.util.getConfiguredServerIds
 import org.openhab.habdroid.util.getPrefs
 import org.openhab.habdroid.util.getSecretPrefs
@@ -252,10 +250,7 @@ class LogActivity :
             "Product: ${Build.PRODUCT}\n" +
             "OS: ${Build.VERSION.RELEASE}\n" +
             "Display: ${displayMetrics.widthPixels}x${displayMetrics.heightPixels}, " +
-            "${displayMetrics.density} density\n" +
-            "Data usage policy: ${determineDataUsagePolicy()}, " +
-            "data saver: ${(applicationContext as OpenHabApplication).systemDataSaverStatus}, " +
-            "battery saver: ${(applicationContext as OpenHabApplication).batterySaverActive}\n"
+            "${displayMetrics.density} density\n"
     }
 
     companion object {

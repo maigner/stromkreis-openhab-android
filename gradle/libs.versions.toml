@@ -106,7 +106,8 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries = { module = "com.mikepenz:aboutlibraries", version.ref = "about-libraries" }
 
 acra-mail = { module = "ch.acra:acra-mail", version.ref = "acra" }
-acra-notification = { module = "ch.acra:acra-notification", version.ref = "acra" }
+acra-dialog = { module = "ch.acra:acra-dialog", version.ref = "acra" }
+guava-listenablefuture = { module = "com.google.guava:listenablefuture", version = "1.0" }
 
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito-core" }
 mockito-kotlin = { module = "com.nhaarman.mockitokotlin2:mockito-kotlin", version.ref = "mockito-kotlin" }

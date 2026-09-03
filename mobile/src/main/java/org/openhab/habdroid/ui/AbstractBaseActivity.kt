@@ -13,33 +13,23 @@
 
 package org.openhab.habdroid.ui
 
-import android.Manifest
-import android.app.KeyguardManager
-import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
-import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.CallSuper
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isInvisible
 import androidx.core.view.updatePadding
 import com.google.android.material.internal.EdgeToEdgeUtils
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -49,18 +39,12 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.asExecutor
-import org.openhab.habdroid.BuildConfig
 import org.openhab.habdroid.R
 import org.openhab.habdroid.databinding.AppBarBinding
-import org.openhab.habdroid.ui.preference.PreferencesActivity
 import org.openhab.habdroid.util.PrefKeys
-import org.openhab.habdroid.util.ScreenLockMode
 import org.openhab.habdroid.util.applyUserSelectedTheme
 import org.openhab.habdroid.util.getConnectionFactory
 import org.openhab.habdroid.util.getPrefs
-import org.openhab.habdroid.util.getScreenLockMode
-import org.openhab.habdroid.util.hasPermissions
 import org.openhab.habdroid.util.resolveThemedColor
 
 abstract class AbstractBaseActivity :
@@ -68,8 +52,6 @@ abstract class AbstractBaseActivity :
     CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext get() = Dispatchers.Main + job
-    protected open val forceNonFullscreen = false
-    private var authPrompt: AuthPrompt? = null
     lateinit var layoutForSnackbar: View
     private lateinit var binding: CommonBinding
     private lateinit var appBarBackground: Drawable
@@ -125,7 +107,6 @@ abstract class AbstractBaseActivity :
     override fun onStart() {
         super.onStart()
         getConnectionFactory().trustManager.bindDisplayActivity(this)
-        promptForDevicePasswordIfRequired()
     }
 
     @CallSuper
@@ -163,7 +144,6 @@ abstract class AbstractBaseActivity :
         //    which conflicts with ours
         // 2) if the toolbar is set to fitsSystemWindow=true, it must not consume insets by itself, as otherwise
         //    it applies the insets to its own padding, which we do not want
-        // 3) if the activity contains a DrawerLayout, it does also own insets handling, starting with its first child
         // -> Conclusion is that a) we need a listener on toolbar which consumes the insets, and b) we need a listener
         //    on something early in the hierarchy to get the full insets
         // -> Putting the listener on the toolbar fulfills both a) and b)
@@ -291,143 +271,7 @@ abstract class AbstractBaseActivity :
         }
     }
 
-    /**
-     * Requests permissions if not already granted. Makes sure to comply with
-     *     * Google Play Store policy
-     *     * Android R background location permission
-     */
-    fun requestPermissionsIfRequired(
-        permissions: Array<String>?,
-        launcher: ActivityResultLauncher<Array<String>>,
-        rationaleDialogCancelCallback: (() -> Unit)? = null
-    ) {
-        var permissionsToRequest = permissions
-            ?.filter { !hasPermissions(arrayOf(it)) }
-            ?.toTypedArray()
-
-        if (permissionsToRequest.isNullOrEmpty() || hasPermissions(permissionsToRequest)) {
-            return
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-            permissionsToRequest.contains(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        ) {
-            if (permissionsToRequest.size > 1) {
-                Log.d(TAG, "Remove background location from permissions to request")
-                permissionsToRequest = permissionsToRequest.toMutableList().apply {
-                    remove(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                }.toTypedArray()
-            } else {
-                showSnackbar(
-                    PreferencesActivity.SNACKBAR_TAG_BG_TASKS_MISSING_PERMISSION_LOCATION,
-                    getString(
-                        R.string.settings_background_tasks_permission_denied_background_location,
-                        packageManager.backgroundPermissionOptionLabel
-                    ),
-                    Snackbar.LENGTH_INDEFINITE,
-                    android.R.string.ok
-                ) {
-                    Intent(Settings.ACTION_APPLICATION_SETTINGS).apply {
-                        putExtra(Settings.EXTRA_APP_PACKAGE, BuildConfig.APPLICATION_ID)
-                        startActivity(this)
-                    }
-                }
-                return
-            }
-        }
-
-        if (
-            permissionsToRequest.contains(Manifest.permission.ACCESS_BACKGROUND_LOCATION) ||
-            permissionsToRequest.contains(Manifest.permission.ACCESS_FINE_LOCATION) ||
-            permissionsToRequest.contains(Manifest.permission.ACCESS_COARSE_LOCATION)
-        ) {
-            Log.d(TAG, "Show dialog to inform user about location permissions")
-            AlertDialog.Builder(this)
-                .setMessage(R.string.settings_location_permissions_required)
-                .setPositiveButton(R.string.settings_background_tasks_permission_allow) { _, _ ->
-                    Log.d(TAG, "Request ${permissionsToRequest.contentToString()} permission")
-                    launcher.launch(permissionsToRequest)
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    rationaleDialogCancelCallback?.invoke()
-                }
-                .show()
-        } else {
-            Log.d(TAG, "Request ${permissionsToRequest.contentToString()} permission")
-            launcher.launch(permissionsToRequest)
-        }
-    }
-
-    private fun promptForDevicePassword() {
-        val km = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-        val locked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) km.isDeviceSecure else km.isKeyguardSecure
-        if (locked) {
-            authPrompt = AuthPrompt()
-            authPrompt?.authenticate()
-        }
-    }
-
-    internal open fun doesLockModeRequirePrompt(mode: ScreenLockMode): Boolean = mode != ScreenLockMode.Disabled
-
-    private fun promptForDevicePasswordIfRequired() {
-        if (authPrompt != null) {
-            return
-        }
-        if (doesLockModeRequirePrompt(getPrefs().getScreenLockMode(this))) {
-            if (timestampNeedsReauth(lastAuthenticationTimestamp)) {
-                promptForDevicePassword()
-            }
-        } else {
-            // Reset last authentication timestamp when going from an activity requiring authentication to an
-            // activity that does not require authentication, so that the prompt will re-appear when going back
-            // to the activity requiring authentication
-            lastAuthenticationTimestamp = 0L
-        }
-    }
-
-    private fun timestampNeedsReauth(ts: Long) =
-        ts == 0L || SystemClock.elapsedRealtime() - ts > AUTHENTICATION_VALIDITY_PERIOD
-
-    private inner class AuthPrompt : BiometricPrompt.AuthenticationCallback() {
-        private val contentView = binding.activityContent
-        private val prompt = BiometricPrompt(this@AbstractBaseActivity, Dispatchers.Main.asExecutor(), this)
-
-        fun authenticate() {
-            val descriptionResId = if (getPrefs().getScreenLockMode(contentView.context) == ScreenLockMode.KioskMode) {
-                R.string.screen_lock_unlock_preferences_description
-            } else {
-                R.string.screen_lock_unlock_screen_description
-            }
-            val info = BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.app_name))
-                .setDescription(getString(descriptionResId))
-                .setAllowedAuthenticators(
-                    BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                        BiometricManager.Authenticators.BIOMETRIC_WEAK or
-                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                )
-                .build()
-            contentView.isInvisible = true
-            prompt.authenticate(info)
-        }
-
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            super.onAuthenticationError(errorCode, errString)
-            finish()
-        }
-
-        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-            super.onAuthenticationSucceeded(result)
-            lastAuthenticationTimestamp = SystemClock.elapsedRealtime()
-            contentView.isInvisible = false
-            authPrompt = null
-        }
-    }
-
     companion object {
         private val TAG = AbstractBaseActivity::class.java.simpleName
-        private const val AUTHENTICATION_VALIDITY_PERIOD = 2 * 60 * 1000L
-
-        var lastAuthenticationTimestamp = 0L
     }
 }

@@ -13,10 +13,6 @@
 
 package org.openhab.habdroid.util
 
-import org.openhab.habdroid.core.StromkreisSetup
-import android.graphics.Bitmap
-import android.util.Log
-import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
 import java.io.IOException
 import java.nio.charset.StandardCharsets
@@ -24,11 +20,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
@@ -44,10 +35,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
-import okhttp3.sse.EventSource
-import okhttp3.sse.EventSourceListener
-import okhttp3.sse.EventSources
-import org.openhab.habdroid.model.Item
+import org.openhab.habdroid.core.StromkreisSetup
 
 class HttpClient(client: OkHttpClient, baseUrl: String?, username: String?, password: String?) {
     private val client: OkHttpClient
@@ -86,19 +74,6 @@ class HttpClient(client: OkHttpClient, baseUrl: String?, username: String?, pass
         FORCE_CACHE_IF_POSSIBLE
     }
 
-    fun makeSse(url: HttpUrl): SseSubscription {
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("User-Agent", USER_AGENT)
-            .build()
-        val client = this.client.newBuilder()
-            .readTimeout(0, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
-            .build()
-        val listener = SseListener()
-        return SseSubscription(EventSources.createFactory(client).newEventSource(request, listener), listener)
-    }
-
     fun buildUrl(url: String): HttpUrl {
         var absoluteUrl = url.toHttpUrlOrNull()
         if (absoluteUrl == null && baseUrl != null) {
@@ -109,19 +84,6 @@ class HttpClient(client: OkHttpClient, baseUrl: String?, username: String?, pass
             throw IllegalArgumentException("URL '$url' is invalid")
         }
         return absoluteUrl
-    }
-
-    fun sendItemCommand(item: Item?, command: String, sourceId: String): Job? {
-        val url = item?.link ?: return null
-        return GlobalScope.launch {
-            try {
-                val headers = mapOf("X-OpenHAB-Source" to sourceId)
-                post(url, command, headers = headers).close()
-                Log.d(TAG, "Command '$command' was sent successfully to $url")
-            } catch (e: HttpException) {
-                Log.e(TAG, "Sending command $command to $url failed: status ${e.statusCode}", e)
-            }
-        }
     }
 
     @Throws(HttpException::class)
@@ -262,29 +224,11 @@ class HttpClient(client: OkHttpClient, baseUrl: String?, username: String?, pass
             close()
             return HttpStatusResult(request, statusCode)
         }
-
-        @Throws(HttpException::class)
-        suspend fun asBitmap(
-            sizeInPixels: Int,
-            @ColorInt fallbackColor: Int,
-            conversionPolicy: ImageConversionPolicy
-        ): HttpBitmapResult = try {
-            val bitmap = withContext(Dispatchers.IO) {
-                response.toBitmap(sizeInPixels, fallbackColor, conversionPolicy)
-            }
-            HttpBitmapResult(request, bitmap)
-        } catch (e: IOException) {
-            throw HttpException(request, originalUrl, e)
-        } finally {
-            close()
-        }
     }
 
     class HttpStatusResult internal constructor(val request: Request, val statusCode: Int)
 
     class HttpTextResult internal constructor(val request: Request, val response: String, val headers: Headers)
-
-    class HttpBitmapResult internal constructor(val request: Request, val response: Bitmap)
 
     class HttpException : Exception {
         val request: Request
@@ -301,36 +245,6 @@ class HttpClient(client: OkHttpClient, baseUrl: String?, username: String?, pass
             this.request = request
             this.originalUrl = originalUrl
             this.statusCode = statusCode
-        }
-    }
-
-    class SseFailureException(val response: Response?, cause: Throwable?) : Exception(cause)
-
-    internal class SseListener : EventSourceListener() {
-        val channel = Channel<String>()
-
-        override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
-            super.onEvent(eventSource, id, type, data)
-            runBlocking {
-                channel.send(data)
-            }
-        }
-
-        override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
-            super.onFailure(eventSource, t, response)
-            runBlocking {
-                channel.close(SseFailureException(response, t))
-            }
-        }
-    }
-
-    class SseSubscription internal constructor(private val source: EventSource, private val listener: SseListener) {
-        @Throws(SseFailureException::class)
-        suspend fun getNextEvent(): String = listener.channel.receive()
-
-        fun cancel() {
-            listener.channel.cancel()
-            source.cancel()
         }
     }
 

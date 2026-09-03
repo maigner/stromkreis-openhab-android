@@ -27,7 +27,6 @@ import java.security.Principal
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
 import java.util.concurrent.CancellationException
-import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManager
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
@@ -43,7 +42,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.internal.tls.OkHostnameVerifier
 import okhttp3.logging.HttpLoggingInterceptor
-import org.openhab.habdroid.core.CloudMessagingHelper
 import org.openhab.habdroid.model.ServerConfiguration
 import org.openhab.habdroid.util.CacheManager
 import org.openhab.habdroid.util.PrefKeys
@@ -172,15 +170,6 @@ class ConnectionFactory internal constructor(
             .hostnameVerifier(trustManager.wrapHostnameVerifier(OkHostnameVerifier))
             .build()
         updateHttpClientForClientCert(true)
-
-        // For video widgets
-        SSLContext.getInstance("TLS").apply {
-            init(null, MemorizingTrustManager.getInstanceList(context), null)
-            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory)
-            val mtmHostnameVerifier = MemorizingTrustManager(context)
-                .wrapHostnameVerifier(OkHostnameVerifier)
-            HttpsURLConnection.setDefaultHostnameVerifier(mtmHostnameVerifier)
-        }
 
         // Relax per-host connection limit, as the default limit (max 5 connections per host) is
         // too low considering SSE connections count against that limit.
@@ -328,12 +317,7 @@ class ConnectionFactory internal constructor(
         primaryCloud: CloudConnectionResult? = stateFlow.value.primaryCloud,
         activeCloud: CloudConnectionResult? = stateFlow.value.activeCloud
     ) {
-        val oldPrimaryCloud = stateFlow.value.primaryCloud?.connection
-        val newState = StateHolder(isIntermediate, primary, active, primaryCloud, activeCloud)
-        stateFlow.tryEmit(newState)
-        if (!isIntermediate && oldPrimaryCloud != primaryCloud?.connection) {
-            CloudMessagingHelper.onPrimaryConnectionUpdated(context, primaryCloud?.connection)
-        }
+        stateFlow.tryEmit(StateHolder(isIntermediate, primary, active, primaryCloud, activeCloud))
     }
 
     private fun triggerConnectionUpdateIfNeededAndPending(): Boolean {
