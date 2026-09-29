@@ -48,6 +48,7 @@ import org.openhab.habdroid.databinding.ActivityMainBinding
 import org.openhab.habdroid.databinding.FragmentStatusBinding
 import org.openhab.habdroid.ui.activity.MainUiWebViewFragment
 import org.openhab.habdroid.ui.preference.PreferencesActivity
+import org.openhab.habdroid.util.HttpClient
 import org.openhab.habdroid.util.getConnectionFactory
 import org.openhab.habdroid.util.getPrefs
 import org.openhab.habdroid.util.isScreenTimerDisabled
@@ -65,6 +66,13 @@ class MainActivity : AbstractBaseActivity() {
     var connection: Connection? = null
         private set
     private var lastConnectionResult: ConnectionFactory.ConnectionResult? = null
+
+    /**
+     * The connection whose credentials the server rejected (e.g. the Stromkreis Cloud password
+     * changed). While it is still the active one, the status screen is shown instead of the Main
+     * UI, and the onboarding is not opened again for it.
+     */
+    private var rejectedConnection: Connection? = null
 
     private val preferenceActivityCallback =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -101,6 +109,12 @@ class MainActivity : AbstractBaseActivity() {
                     if (info.conn != lastConnectionResult) {
                         lastConnectionResult = info.conn
                         handleConnectionChange(info.conn)
+                    }
+                    // The Stromkreis Cloud check is an authenticated request, so a 401 there
+                    // means the stored credentials are no longer valid
+                    val cloudFailure = info.cloud?.failureReason as? HttpClient.HttpException
+                    if (info.conn?.connection != null && cloudFailure?.statusCode == 401) {
+                        onCredentialsRejected()
                     }
                 }
             }
@@ -152,6 +166,8 @@ class MainActivity : AbstractBaseActivity() {
         connection = result?.connection
         val failureReason = result?.failureReason
         when {
+            connection != null && connection == rejectedConnection -> showCredentialsRejected()
+
             connection != null -> showMainUi()
 
             failureReason is NoUrlInformationException -> showStatus(
@@ -205,6 +221,60 @@ class MainActivity : AbstractBaseActivity() {
     }
 
     fun retryConnection() {
+        if (rejectedConnection != null && rejectedConnection == connection) {
+            // Give the stored credentials another chance, e.g. after a temporary server problem
+            rejectedConnection = null
+            showMainUi()
+        }
+        getConnectionFactory().restartNetworkCheck()
+    }
+
+    /**
+     * Called when a server rejected the stored credentials. The app has no credential entry, so
+     * the QR/link setup is opened again (once per rejected connection) with an explanation.
+     */
+    fun onCredentialsRejected() {
+        val current = connection ?: return
+        if (current == rejectedConnection) {
+            return
+        }
+        Log.w(TAG, "Stored credentials rejected, starting onboarding")
+        rejectedConnection = current
+        showCredentialsRejected()
+        startActivity(
+            Intent(this, OnboardingActivity::class.java)
+                .putExtra(OnboardingActivity.EXTRA_CREDENTIALS_REJECTED, true)
+        )
+    }
+
+    private fun showCredentialsRejected() {
+        showStatus(
+            StatusFragment.newInstance(
+                getString(R.string.credentials_rejected),
+                R.drawable.ic_openhab_appicon_340dp,
+                showProgress = false,
+                button1TextResId = R.string.try_again_button,
+                button2TextResId = R.string.scan_setup_code_button
+            )
+        )
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (!intent.hasExtra(EXTRA_SETUP_CONNECTION_CHANGED) || rejectedConnection == null) {
+            return
+        }
+        if (intent.getBooleanExtra(EXTRA_SETUP_CONNECTION_CHANGED, false)) {
+            // New credentials: the connection factory is switching to them. Wait for that
+            // connection instead of reloading with the rejected one.
+            showStatus(StatusFragment.newInstance(null, 0, showProgress = true))
+        } else {
+            // The setup re-confirmed the same credentials: forget the rejection and retry
+            rejectedConnection = null
+            if (connection != null) {
+                showMainUi()
+            }
+        }
         getConnectionFactory().restartNetworkCheck()
     }
 
@@ -279,5 +349,8 @@ class MainActivity : AbstractBaseActivity() {
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
+
+        /** Set by [OnboardingActivity] after a successful setup: whether the connection changed. */
+        const val EXTRA_SETUP_CONNECTION_CHANGED = "setupConnectionChanged"
     }
 }

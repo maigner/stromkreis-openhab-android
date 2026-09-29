@@ -51,7 +51,8 @@ import org.openhab.habdroid.databinding.ActivityOnboardingBinding
  * `stromkreis://setup?…` and `https://stromkreis.net/app/setup/…` links, which run the setup
  * automatically.
  *
- * The screen can only be closed once the active server has a Stromkreis Cloud login.
+ * The screen can only be closed once the active server has a Stromkreis Cloud login. It is also
+ * shown again when the server rejects the stored credentials ([EXTRA_CREDENTIALS_REJECTED]).
  */
 class OnboardingActivity :
     AppCompatActivity(),
@@ -66,11 +67,14 @@ class OnboardingActivity :
     private var cameraBound = false
     private var phase: Phase = Phase.Idle
 
+    /** Explains why the setup reappeared; shown above the scanner until a setup succeeds. */
+    private var showCredentialsRejectedNotice = false
+
     private sealed class Phase {
         object Idle : Phase()
         object Working : Phase()
         class Failed(val message: String) : Phase()
-        class Succeeded(val name: String) : Phase()
+        class Succeeded(val name: String, val connectionChanged: Boolean) : Phase()
     }
 
     private val cameraPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -139,6 +143,13 @@ class OnboardingActivity :
     }
 
     private fun handleIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_CREDENTIALS_REJECTED, false) == true) {
+            intent.removeExtra(EXTRA_CREDENTIALS_REJECTED)
+            showCredentialsRejectedNotice = true
+            if (phase !is Phase.Working) {
+                setPhase(Phase.Idle)
+            }
+        }
         val data = intent?.data ?: return
         // Handle each link only once, e.g. not again after a configuration change
         intent.data = null
@@ -174,8 +185,9 @@ class OnboardingActivity :
         launch {
             try {
                 val credentials = StromkreisSetup.resolve(link, httpClient)
-                val config = StromkreisSetup.apply(this@OnboardingActivity, credentials)
-                setPhase(Phase.Succeeded(config.name))
+                val result = StromkreisSetup.apply(this@OnboardingActivity, credentials)
+                showCredentialsRejectedNotice = false
+                setPhase(Phase.Succeeded(result.config.name, result.connectionChanged))
             } catch (e: StromkreisSetupException) {
                 Log.e(TAG, "Stromkreis setup failed", e)
                 setPhase(Phase.Failed(messageFor(e)))
@@ -212,6 +224,7 @@ class OnboardingActivity :
 
     private fun updateUi() {
         val currentPhase = phase
+        binding.noticeCard.isVisible = currentPhase is Phase.Idle && showCredentialsRejectedNotice
         binding.scannerCard.isVisible = currentPhase is Phase.Idle
         binding.pasteCard.isVisible = currentPhase is Phase.Idle
         binding.statusCard.isVisible = currentPhase !is Phase.Idle
@@ -240,6 +253,9 @@ class OnboardingActivity :
     private fun openMainAndFinish() {
         val intent = Intent(this, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        (phase as? Phase.Succeeded)?.let {
+            intent.putExtra(MainActivity.EXTRA_SETUP_CONNECTION_CHANGED, it.connectionChanged)
+        }
         startActivity(intent)
         finish()
     }
@@ -325,5 +341,8 @@ class OnboardingActivity :
     companion object {
         private val TAG = OnboardingActivity::class.java.simpleName
         private val INVALID_TOKEN_STATUS_CODES = listOf(401, 403, 404, 410)
+
+        /** Boolean extra: the server rejected the stored credentials, explain why setup is shown again. */
+        const val EXTRA_CREDENTIALS_REJECTED = "credentialsRejected"
     }
 }

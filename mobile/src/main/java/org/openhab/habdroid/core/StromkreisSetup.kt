@@ -58,6 +58,12 @@ sealed class StromkreisSetupLink {
     data class Credentials(val credentials: StromkreisCloudCredentials) : StromkreisSetupLink()
 }
 
+/**
+ * Outcome of [StromkreisSetup.apply]. [connectionChanged] is false when re-redeeming a link for the
+ * account that is already configured, so callers can skip a disruptive reload.
+ */
+data class StromkreisSetupResult(val config: ServerConfiguration, val connectionChanged: Boolean)
+
 sealed class StromkreisSetupException(message: String, cause: Throwable? = null) : Exception(message, cause) {
     class UnrecognizedPayload : StromkreisSetupException("Not a Stromkreis setup code")
 
@@ -278,7 +284,7 @@ object StromkreisSetup {
      * Writes the credentials into the active server's remote (Stromkreis Cloud) connection, creating
      * the server if none exists yet.
      */
-    fun apply(context: Context, credentials: StromkreisCloudCredentials): ServerConfiguration {
+    fun apply(context: Context, credentials: StromkreisCloudCredentials): StromkreisSetupResult {
         val prefs = context.getPrefs()
         val secretPrefs = context.getSecretPrefs()
         val existing = ServerConfiguration.load(prefs, secretPrefs, prefs.getActiveServerId())
@@ -305,9 +311,12 @@ object StromkreisSetup {
                 null
             )
         }
-        config.saveToPrefs(prefs, secretPrefs)
-        Log.i(TAG, "Stromkreis Cloud connection configured for server ${config.id}")
-        return config
+        val connectionChanged = existing?.remotePath != config.remotePath
+        if (config != existing) {
+            config.saveToPrefs(prefs, secretPrefs)
+        }
+        Log.i(TAG, "Stromkreis Cloud connection configured for server ${config.id} (changed: $connectionChanged)")
+        return StromkreisSetupResult(config, connectionChanged)
     }
 
     /**

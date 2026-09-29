@@ -97,6 +97,22 @@ fingerprints. `stromkreis://` links work immediately without server support, whi
   encrypted preferences); the server is created if none exists, named after `siteName`. After the
   setup, `MainActivity` always shows the Main UI - it is the only content screen of the app.
 
+### Rejected credentials
+
+The app has no credential entry. When the server rejects the stored login (e.g. the Stromkreis
+Cloud password was changed) - detected as a 401 from the cloud connection check or a repeated
+basic-auth challenge in the Main UI web view - the main screen switches to a status screen and the
+onboarding opens once with the notice *Dein Zugang ist nicht mehr gültig …*. A successful setup
+returns to the Main UI; re-redeeming a link that yields the same credentials does not reload
+anything (`StromkreisSetup.apply` reports whether the connection changed). Mirrors the iOS
+`stromkreisCredentialsRejected` flow.
+
+### Main UI chrome
+
+`StromkreisChrome` injects CSS/JS (at document start where the WebView supports it) that hides the
+Main UI's left sidebar (admin login, chat, help), its hamburger and swipe gesture, and the navbar
+actions on the right (edit page, page settings). Same script as `stromkreisChromeJS` on iOS.
+
 ## Notifications
 
 The app contains no Google services, so there is no push and no notification handling at all.

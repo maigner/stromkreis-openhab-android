@@ -52,6 +52,36 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
+            <!-- Why the setup is shown again (e.g. rejected credentials) -->
+            <LinearLayout
+                android:id="@+id/notice_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_onboarding_card"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_warning_yellow_48dp"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/notice_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="@string/credentials_rejected"
+                    android:textColor="@android:color/white"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
             <!-- QR code scanner -->
             <LinearLayout
                 android:id="@+id/scanner_card"

@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.webkit.ScriptHandler
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +60,8 @@ import org.openhab.habdroid.util.loadActiveServerConfig
 
 /**
  * Shows the openHAB Main UI of the Stromkreis gateway in a WebView, using the current
- * connection's credentials. Reloads itself whenever the active connection changes.
+ * connection's credentials. Reloads itself only when the connection's URL or credentials change -
+ * reloading otherwise would throw away the Main UI's live page state.
  */
 class MainUiWebViewFragment :
     Fragment(),
@@ -69,6 +71,7 @@ class MainUiWebViewFragment :
 
     private var binding: FragmentWebviewBinding? = null
     private val webView get() = binding?.webview
+    private var chromeScript: ScriptHandler? = null
 
     private val permissionRequester = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -89,9 +92,10 @@ class MainUiWebViewFragment :
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 requireContext().getConnectionFactory().activeFlow.collectLatest { info ->
-                    val usedConnection = webView?.tag as? Connection
-                    val newConnection = info.conn?.connection
-                    if (newConnection != null && newConnection != usedConnection) {
+                    // Compare what is shown with what would be shown: the connection check runs
+                    // on every resume and network change, but usually yields the same connection.
+                    val newConnection = info.usableConnection
+                    if (newConnection != null && identityOf(newConnection) != webView?.tag) {
                         loadWebsite()
                     }
                 }
@@ -169,6 +173,8 @@ class MainUiWebViewFragment :
 
     override fun onDestroyView() {
         super.onDestroyView()
+        StromkreisChrome.uninstall(chromeScript)
+        chromeScript = null
         webView?.destroy()
         binding = null
     }
@@ -226,8 +232,27 @@ class MainUiWebViewFragment :
         webView.setUpForConnection(conn)
         webView.setBackgroundColor(Color.TRANSPARENT)
         webView.addJavascriptInterface(OHAppInterface(requireContext(), this), "OHApp")
+        StromkreisChrome.uninstall(chromeScript)
+        chromeScript = StromkreisChrome.installAtDocumentStart(webView, url)
 
-        webView.webViewClient = object : ConnectionWebViewClient(conn) {
+        val onCredentialsRejected = {
+            launch { (activity as? MainActivity)?.onCredentialsRejected() }
+            Unit
+        }
+        webView.webViewClient = object : ConnectionWebViewClient(conn, onCredentialsRejected) {
+            override fun onPageCommitVisible(view: WebView, url: String) {
+                if (chromeScript == null) {
+                    // No document-start scripts on this WebView version
+                    StromkreisChrome.injectNow(view)
+                }
+            }
+
+            override fun onPageFinished(view: WebView, url: String) {
+                if (chromeScript == null) {
+                    StromkreisChrome.injectNow(view)
+                }
+            }
+
             private fun handleError(url: Uri) {
                 if (url.path == PATH_FOR_ERROR) {
                     updateViewVisibility(true, null)
@@ -254,7 +279,7 @@ class MainUiWebViewFragment :
                 handleError(request.url)
             }
         }
-        webView.tag = conn
+        webView.tag = identityOf(conn)
         webView.loadUrl(url.toString())
     }
 
@@ -322,6 +347,16 @@ class MainUiWebViewFragment :
 
     companion object {
         private val TAG = MainUiWebViewFragment::class.java.simpleName
+
+        /**
+         * What determines the page content: target URL(s) and credentials. Deliberately not
+         * [Connection.equals], which also covers the network and metered state, and never matches
+         * between the remote connection and the cloud connection derived from it.
+         */
+        private fun identityOf(connection: Connection): String {
+            val proxyUrl = (connection as? CloudConnection)?.proxyUrl
+            return "${connection.httpClient.buildUrl("/")}|$proxyUrl|${connection.username}|${connection.password}"
+        }
 
         private const val DEFAULT_URL = "/"
         private const val PATH_FOR_ERROR = "/"

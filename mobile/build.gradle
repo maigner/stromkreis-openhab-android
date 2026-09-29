@@ -136,6 +136,8 @@ dependencies {
     implementation libs.multidex
 
     implementation libs.security.crypto
+    // Injecting the Stromkreis Main UI chrome script at document start
+    implementation libs.webkit
 
     implementation libs.okhttp
     implementation libs.logging.interceptor

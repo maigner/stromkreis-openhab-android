@@ -28,6 +28,7 @@ photoview = "2.3.0"
 skeletonlayout = "5.0.0"
 androidsvg = "1.4"
 camerax = "1.4.2"
+webkit = "1.12.1"
 zxing = "3.5.3"
 colorpicker = "0.1.1"
 
@@ -86,6 +87,7 @@ media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", versio
 photoview = { module = "com.github.chrisbanes:PhotoView", version.ref = "photoview" }
 skeletonlayout = { module = "com.faltenreich:skeletonlayout", version.ref = "skeletonlayout" }
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
+webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }

@@ -43,10 +43,27 @@ import org.openhab.habdroid.util.getPrefs
 import org.openhab.habdroid.util.getStringOrNull
 import org.openhab.habdroid.util.openInBrowser
 
-open class ConnectionWebViewClient(val connection: Connection) : WebViewClient() {
+/**
+ * @param onCredentialsRejected called when one of the connection's own hosts rejects the stored
+ * credentials (e.g. the Stromkreis Cloud password changed). The app has no credential entry -
+ * access is provisioned via the QR/link setup - so the challenge is cancelled instead of retried.
+ */
+open class ConnectionWebViewClient(
+    val connection: Connection,
+    private val onCredentialsRejected: (() -> Unit)? = null
+) : WebViewClient() {
+    private val answeredAuthHosts = mutableSetOf<String>()
+
     override fun onReceivedHttpAuthRequest(view: WebView, handler: HttpAuthHandler, host: String, realm: String) {
         val proxyHost = (connection as? CloudConnection)?.proxyUrl?.host
         if ((proxyHost != null && host == proxyHost) || host == connection.httpClient.targetHost) {
+            // A second challenge for a host we already answered means the credentials were rejected
+            if (!answeredAuthHosts.add(host) || connection.username.isNullOrEmpty()) {
+                Log.w(TAG, "Stored credentials rejected by $host")
+                handler.cancel()
+                onCredentialsRejected?.invoke()
+                return
+            }
             handler.proceed(connection.username, connection.password)
         } else {
             super.onReceivedHttpAuthRequest(view, handler, host, realm)

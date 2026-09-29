@@ -25,6 +25,7 @@
     <string name="onboarding_error_token_rejected">Dieser Einrichtungscode ist ungültig oder wurde bereits verwendet. Bitte deinen Stromkreis-Admin um einen neuen.</string>
     <string name="onboarding_error_server_rejected">Der Stromkreis-Server hat den Einrichtungscode abgelehnt (HTTP %d).</string>
     <string name="onboarding_error_invalid_response">Der Stromkreis-Server hat unerwartet geantwortet. Bitte versuche es später erneut.</string>
+    <string name="credentials_rejected">Dein Zugang ist nicht mehr gültig – zum Beispiel, weil das Passwort geändert wurde. Scanne den QR-Code von deiner Stromkreis-Seite erneut oder füge einen neuen Einrichtungslink ein.</string>
     <string name="onboarding_error_network">Der Stromkreis-Server ist nicht erreichbar. Prüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="settings_stromkreis_setup">Stromkreis-Einrichtungscode scannen</string>
     <string name="settings_stromkreis_setup_summary">Scanne den einmaligen QR-Code von deiner Stromkreis-Seite, um die App (erneut) mit der Stromkreis-Cloud zu verbinden.</string>
