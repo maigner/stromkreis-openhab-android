@@ -14,23 +14,11 @@
 package org.openhab.habdroid.core.connection
 
 import android.app.Application
-import android.content.Context
 import android.content.SharedPreferences
 import android.net.NetworkCapabilities
-import android.security.KeyChain
-import android.security.KeyChainException
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import de.duenndns.ssl.MemorizingTrustManager
-import java.net.Socket
-import java.security.Principal
-import java.security.PrivateKey
-import java.security.cert.X509Certificate
 import java.util.concurrent.CancellationException
-import javax.net.ssl.KeyManager
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509KeyManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,14 +28,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import okhttp3.internal.tls.OkHostnameVerifier
 import okhttp3.logging.HttpLoggingInterceptor
 import org.openhab.habdroid.model.ServerConfiguration
 import org.openhab.habdroid.util.CacheManager
 import org.openhab.habdroid.util.PrefKeys
 import org.openhab.habdroid.util.getActiveServerId
 import org.openhab.habdroid.util.getPrimaryServerId
-import org.openhab.habdroid.util.getStringOrNull
 import org.openhab.habdroid.util.isDebugModeEnabled
 
 /**
@@ -64,10 +50,8 @@ class ConnectionFactory internal constructor(
 ) : CoroutineScope by CoroutineScope(Dispatchers.Main),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
-    val trustManager: MemorizingTrustManager
     private val httpLogger: HttpLoggingInterceptor
-    private var httpClient: OkHttpClient
-    private var lastClientCertAlias: String? = null
+    private val httpClient: OkHttpClient
 
     private var primaryConn: ServerConnections? = null
     private var activeConn: ServerConnections? = null
@@ -163,13 +147,11 @@ class ConnectionFactory internal constructor(
         httpLogger = HttpLoggingInterceptor()
         updateHttpLoggerSettings()
 
-        trustManager = MemorizingTrustManager(context)
+        // Standard system TLS validation only: no user-accepted certificates, no client certificates
         httpClient = OkHttpClient.Builder()
             .cache(CacheManager.getInstance(context).httpCache)
             .addInterceptor(httpLogger)
-            .hostnameVerifier(trustManager.wrapHostnameVerifier(OkHostnameVerifier))
             .build()
-        updateHttpClientForClientCert(true)
 
         // Relax per-host connection limit, as the default limit (max 5 connections per host) is
         // too low considering SSE connections count against that limit.
@@ -227,11 +209,6 @@ class ConnectionFactory internal constructor(
         }
         val serverId = prefs.getActiveServerId()
         if (key in UPDATE_TRIGGERING_KEYS ||
-            CLIENT_CERT_UPDATE_TRIGGERING_PREFIXES.any { prefix -> key == PrefKeys.buildServerKey(serverId, prefix) }
-        ) {
-            updateHttpClientForClientCert(false)
-        }
-        if (key in UPDATE_TRIGGERING_KEYS ||
             UPDATE_TRIGGERING_PREFIXES.any { prefix -> key == PrefKeys.buildServerKey(serverId, prefix) }
         ) {
             launch {
@@ -274,39 +251,6 @@ class ConnectionFactory internal constructor(
             } else {
                 level = HttpLoggingInterceptor.Level.NONE
             }
-        }
-    }
-
-    private fun updateHttpClientForClientCert(forceUpdate: Boolean) {
-        val clientCertAlias =
-            prefs.getStringOrNull(PrefKeys.buildServerKey(prefs.getActiveServerId(), PrefKeys.SSL_CLIENT_CERT_PREFIX))
-        val keyManagers = if (clientCertAlias != null) {
-            arrayOf<KeyManager>(ClientKeyManager(context, clientCertAlias))
-        } else {
-            null
-        }
-
-        // Updating the SSL socket factory is an expensive call;
-        // make sure to only do this if really needed.
-        if (!forceUpdate) {
-            if (clientCertAlias == null && lastClientCertAlias == null) {
-                // No change: no client cert at all
-                return
-            } else if (clientCertAlias != null && clientCertAlias == lastClientCertAlias) {
-                // No change: client cert stayed the same
-                return
-            }
-        }
-
-        try {
-            val sslContext = SSLContext.getInstance("TLS")
-            sslContext.init(keyManagers, arrayOf<TrustManager>(trustManager), null)
-            httpClient = httpClient.newBuilder()
-                .sslSocketFactory(sslContext.socketFactory, trustManager)
-                .build()
-            lastClientCertAlias = clientCertAlias
-        } catch (e: Exception) {
-            Log.d(TAG, "Applying certificate trust settings failed", e)
         }
     }
 
@@ -488,64 +432,6 @@ class ConnectionFactory internal constructor(
         throw if (hasWrongWifi) WrongWifiException() else NoUrlInformationException(true)
     }
 
-    private class ClientKeyManager(context: Context, private val alias: String?) : X509KeyManager {
-        private val context: Context = context.applicationContext
-
-        override fun chooseClientAlias(
-            keyTypes: Array<String>?,
-            issuers: Array<out Principal>?,
-            socket: Socket?
-        ): String? {
-            Log.d(TAG, "chooseClientAlias - alias: $alias")
-            return alias
-        }
-
-        override fun chooseServerAlias(keyType: String?, issuers: Array<out Principal>?, socket: Socket?): String? {
-            Log.d(TAG, "chooseServerAlias")
-            return null
-        }
-
-        override fun getCertificateChain(alias: String?): Array<X509Certificate>? {
-            Log.d(TAG, "getCertificateChain", Throwable())
-            return try {
-                alias?.let { KeyChain.getCertificateChain(context, alias) }
-            } catch (e: KeyChainException) {
-                Log.e(TAG, "Failed loading certificate chain", e)
-                null
-            } catch (e: InterruptedException) {
-                Log.e(TAG, "Failed loading certificate chain", e)
-                null
-            }
-        }
-
-        override fun getClientAliases(keyType: String?, issuers: Array<out Principal>?): Array<String>? {
-            Log.d(TAG, "getClientAliases")
-            return alias?.let { arrayOf(it) }
-        }
-
-        override fun getServerAliases(keyType: String?, issuers: Array<out Principal>?): Array<String>? {
-            Log.d(TAG, "getServerAliases")
-            return null
-        }
-
-        override fun getPrivateKey(alias: String?): PrivateKey? {
-            Log.d(TAG, "getPrivateKey")
-            return try {
-                alias?.let { KeyChain.getPrivateKey(context, alias) }
-            } catch (e: KeyChainException) {
-                Log.e(TAG, "Failed loading private key", e)
-                null
-            } catch (e: InterruptedException) {
-                Log.e(TAG, "Failed loading private key", e)
-                null
-            }
-        }
-
-        companion object {
-            private val TAG = ClientKeyManager::class.java.simpleName
-        }
-    }
-
     companion object {
         private val TAG = ConnectionFactory::class.java.simpleName
         private val UPDATE_TRIGGERING_KEYS = listOf(
@@ -559,10 +445,8 @@ class ConnectionFactory internal constructor(
             PrefKeys.LOCAL_PASSWORD_PREFIX,
             PrefKeys.REMOTE_USERNAME_PREFIX,
             PrefKeys.REMOTE_PASSWORD_PREFIX,
-            PrefKeys.SSL_CLIENT_CERT_PREFIX,
             PrefKeys.WIFI_SSID_PREFIX,
             PrefKeys.RESTRICT_TO_SSID_PREFIX
         )
-        private val CLIENT_CERT_UPDATE_TRIGGERING_PREFIXES = listOf(PrefKeys.SSL_CLIENT_CERT_PREFIX)
     }
 }

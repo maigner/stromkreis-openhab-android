@@ -30,8 +30,10 @@ the same links and QR codes and talk to the same platform endpoint.
 | Inline credentials (offline QR) | `stromkreis://setup?username=…&password=…[&cloudUrl=…][&siteName=…]` |
 | Inline credentials (JSON QR) | `{"v":1,"username":"…","password":"…","cloudUrl":"https://hac.stromkreis.net","siteName":"…"}` |
 
-Any `https` host is accepted for the `/app/setup/…` form (self-hosted platforms); the origin of the
-link is used to redeem the token. Parsing lives in
+Only `https` URLs on `stromkreis.net` or one of its subdomains are accepted - for the
+`/app/setup/…` link, the `origin` parameter and `cloudUrl`. Anything else (other hosts, `http`,
+look-alikes such as `stromkreis.net.evil.example`) is rejected as "not a setup code". The origin of
+the link is used to redeem the token. Parsing lives in
 `mobile/src/main/java/org/openhab/habdroid/core/StromkreisSetup.kt` (unit tests in
 `mobile/src/test/java/org/openhab/habdroid/core/StromkreisSetupTest.kt`).
 
@@ -106,6 +108,15 @@ onboarding opens once with the notice *Dein Zugang ist nicht mehr gültig …*. 
 returns to the Main UI; re-redeeming a link that yields the same credentials does not reload
 anything (`StromkreisSetup.apply` reports whether the connection changed). Mirrors the iOS
 `stromkreisCredentialsRejected` flow.
+
+### Network and TLS
+
+The app only talks to `stromkreis.net` over https (`network_security_config.xml`: no cleartext, system
+CAs only). There is no custom certificate handling: no "accept this certificate" prompt, no client
+certificates, no user-installed CAs. `http://` redirects the gateway emits for its own
+`*.stromkreis.net` address are upgraded to `https://` in the web view
+(`StromkreisSetup.upgradedToHttps`). The Main UI never gets camera or microphone access (WebRTC
+requests are denied); the camera permission is only used by the QR scanner.
 
 ### Main UI chrome
 

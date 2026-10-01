@@ -59,7 +59,6 @@ data class ServerConfiguration(
     val name: String,
     val localPath: ServerPath?,
     val remotePath: ServerPath?,
-    val sslClientCert: String?,
     val defaultSitemap: DefaultSitemap?,
     val wifiSsids: Set<String>?,
     val restrictToWifiSsids: Boolean,
@@ -76,7 +75,8 @@ data class ServerConfiguration(
             putString(PrefKeys.buildServerKey(id, PrefKeys.REMOTE_URL_PREFIX), remotePath?.url)
             putString(PrefKeys.buildServerKey(id, PrefKeys.FRONTAIL_URL_PREFIX), frontailUrl)
             putString(PrefKeys.buildServerKey(id, PrefKeys.MAIN_UI_START_PAGE_PREFIX), mainUiStartPage)
-            putString(PrefKeys.buildServerKey(id, PrefKeys.SSL_CLIENT_CERT_PREFIX), sslClientCert)
+            // Client certificates are not supported (standard TLS only); drop legacy values
+            remove(PrefKeys.buildServerKey(id, PrefKeys.SSL_CLIENT_CERT_PREFIX))
             putStringSet(PrefKeys.buildServerKey(id, PrefKeys.WIFI_SSID_PREFIX), wifiSsids)
             putBoolean(PrefKeys.buildServerKey(id, PrefKeys.RESTRICT_TO_SSID_PREFIX), restrictToWifiSsids)
             if (!serverIdSet.contains(id)) {
@@ -170,7 +170,6 @@ data class ServerConfiguration(
             if ((localPath == null && remotePath == null) || serverName.isNullOrEmpty()) {
                 return null
             }
-            val clientCert = prefs.getStringOrNull(PrefKeys.buildServerKey(id, PrefKeys.SSL_CLIENT_CERT_PREFIX))
             val wifiSsids = try {
                 prefs.getStringSet(PrefKeys.buildServerKey(id, PrefKeys.WIFI_SSID_PREFIX), emptySet())
             } catch (e: ClassCastException) {
@@ -186,7 +185,6 @@ data class ServerConfiguration(
                 serverName,
                 localPath,
                 remotePath,
-                clientCert,
                 getDefaultSitemap(prefs, id),
                 wifiSsids,
                 restrictToWifiSsids,
@@ -222,7 +220,6 @@ data class ServerConfiguration(
             name: String = config.name,
             localPath: ServerPath? = config.localPath,
             remotePath: ServerPath? = config.remotePath,
-            sslClientCert: String? = config.sslClientCert,
             defaultSitemap: DefaultSitemap? = config.defaultSitemap,
             wifiSsids: Set<String>? = config.wifiSsids,
             restrictToWifiSsids: Boolean = config.restrictToWifiSsids,
@@ -233,7 +230,6 @@ data class ServerConfiguration(
             name,
             localPath,
             remotePath,
-            sslClientCert,
             defaultSitemap,
             wifiSsids,
             restrictToWifiSsids,

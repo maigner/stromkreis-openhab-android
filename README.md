@@ -61,7 +61,9 @@ The app deliberately contains no Google services:
 * no Firebase Cloud Messaging: the current data is fetched from the Stromkreis Cloud whenever the app is opened
 * no Crashlytics: crash reports are offered as e-mail via ACRA
 
-The only permissions are INTERNET, ACCESS_NETWORK_STATE and CAMERA (QR code scanner).
+The only permissions are INTERNET, ACCESS_NETWORK_STATE and CAMERA (QR code scanner). The app only
+connects to `https://*.stromkreis.net`, with standard system certificate validation (no cleartext, no
+custom or client certificates).
 
 Application IDs: `net.stromkreis.app` (stable) and `net.stromkreis.app.beta` (beta). Both are fine for Google Play,
 F-Droid or direct APK distribution.

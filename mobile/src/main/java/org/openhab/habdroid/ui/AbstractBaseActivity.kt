@@ -43,7 +43,6 @@ import org.openhab.habdroid.R
 import org.openhab.habdroid.databinding.AppBarBinding
 import org.openhab.habdroid.util.PrefKeys
 import org.openhab.habdroid.util.applyUserSelectedTheme
-import org.openhab.habdroid.util.getConnectionFactory
 import org.openhab.habdroid.util.getPrefs
 import org.openhab.habdroid.util.resolveThemedColor
 
@@ -102,18 +101,6 @@ abstract class AbstractBaseActivity :
     }
 
     protected abstract fun inflateBinding(): CommonBinding
-
-    @CallSuper
-    override fun onStart() {
-        super.onStart()
-        getConnectionFactory().trustManager.bindDisplayActivity(this)
-    }
-
-    @CallSuper
-    override fun onStop() {
-        super.onStop()
-        getConnectionFactory().trustManager.unbindDisplayActivity(this)
-    }
 
     @CallSuper
     override fun onDestroy() {

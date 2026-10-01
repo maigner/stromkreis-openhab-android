@@ -109,11 +109,6 @@
             android:name=".ui.LogActivity"
             android:label="@string/log"
             android:exported="false" />
-        <activity
-            android:name="de.duenndns.ssl.MemorizingActivity"
-            android:excludeFromRecents="true"
-            android:theme="@style/Theme.MaterialComponents.Translucent"
-            android:exported="false" />
     </application>
 
 </manifest>

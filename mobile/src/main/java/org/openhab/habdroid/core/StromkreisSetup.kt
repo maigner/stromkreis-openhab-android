@@ -23,6 +23,7 @@ import java.net.URLDecoder
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -101,6 +102,7 @@ object StromkreisSetup {
     const val URL_SCHEME = "stromkreis"
     const val SETUP_PATH_PREFIX = "/app/setup"
     const val REDEEM_PATH = "/api/app/setup/v1"
+    const val TRUSTED_DOMAIN = "stromkreis.net"
     private const val REDEEM_TIMEOUT_SECONDS = 15L
 
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
@@ -109,6 +111,35 @@ object StromkreisSetup {
      * True when [host] is the Stromkreis Cloud (the openHAB Cloud instance members reach their gateway through).
      */
     fun isCloudHost(host: String?): Boolean = host.equals(DEFAULT_CLOUD_HOST, ignoreCase = true)
+
+    /**
+     * True for `https` URLs on `stromkreis.net` or one of its subdomains. The app never talks to
+     * anything else: setup links, redeem origins and cloud URLs pointing elsewhere are rejected.
+     */
+    fun isTrusted(uri: URI): Boolean {
+        if (uri.scheme?.lowercase() != "https") {
+            return false
+        }
+        val host = uri.host?.lowercase() ?: return false
+        return host == TRUSTED_DOMAIN || host.endsWith(".$TRUSTED_DOMAIN")
+    }
+
+    fun isTrusted(url: String): Boolean = runCatching { isTrusted(URI(url)) }.getOrDefault(false)
+
+    /**
+     * For an `http` URL on the trusted domain, the same URL over `https`; null for anything else.
+     * Used to upgrade redirects that the proxied gateway emits with the wrong scheme - cleartext
+     * traffic is not permitted.
+     */
+    fun upgradedToHttps(url: String): String? {
+        val httpUrl = url.toHttpUrlOrNull()?.takeIf { it.scheme == "http" } ?: return null
+        val upgraded = httpUrl.newBuilder()
+            .scheme("https")
+            .port(if (httpUrl.port == 80) 443 else httpUrl.port)
+            .build()
+            .toString()
+        return upgraded.takeIf { isTrusted(it) }
+    }
 
     // Parsing
 
@@ -140,16 +171,16 @@ object StromkreisSetup {
             }
             credentialsFromQuery(query)?.let { return StromkreisSetupLink.Credentials(it) }
             val token = query["token"] ?: return null
-            val origin = query["origin"]
-                ?.let { runCatching { URI(it) }.getOrNull() }
+            val originString = query["origin"] ?: return StromkreisSetupLink.Token(token, PLATFORM_ORIGIN)
+            val origin = runCatching { URI(originString) }.getOrNull()
+                ?.takeIf { isTrusted(it) }
                 ?.let { originOf(it) }
-                ?: PLATFORM_ORIGIN
+                ?: return null
             return StromkreisSetupLink.Token(token, origin)
         }
 
-        // https://<platform>/app/setup/<token>. Only stromkreis.net arrives as an app link,
-        // but a scanned QR code may point at a self-hosted platform, so any host is accepted.
-        if (scheme != "https" && scheme != "http") {
+        // https://<platform>/app/setup/<token>, only on stromkreis.net
+        if (!isTrusted(uri)) {
             return null
         }
         val origin = originOf(uri) ?: return null
@@ -206,8 +237,12 @@ object StromkreisSetup {
     private fun credentialsFromQuery(query: Map<String, String>): StromkreisCloudCredentials? {
         val username = query["username"] ?: return null
         val password = query["password"] ?: return null
+        val cloudUrl = query["cloudUrl"] ?: DEFAULT_CLOUD_URL
+        if (!isTrusted(cloudUrl)) {
+            return null
+        }
         return StromkreisCloudCredentials(
-            cloudUrl = query["cloudUrl"] ?: DEFAULT_CLOUD_URL,
+            cloudUrl = cloudUrl,
             username = username,
             password = password,
             siteName = query["siteName"]
@@ -225,8 +260,12 @@ object StromkreisSetup {
         if (username.isEmpty() || password.isEmpty()) {
             return null
         }
+        val cloudUrl = json.optString("cloudUrl").ifEmpty { DEFAULT_CLOUD_URL }
+        if (!isTrusted(cloudUrl)) {
+            return null
+        }
         return StromkreisCloudCredentials(
-            cloudUrl = json.optString("cloudUrl").ifEmpty { DEFAULT_CLOUD_URL },
+            cloudUrl = cloudUrl,
             username = username,
             password = password,
             siteName = json.optString("siteName").ifEmpty { null }
@@ -303,7 +342,6 @@ object StromkreisSetup {
                 name,
                 null,
                 remotePath,
-                null,
                 null,
                 null,
                 false,

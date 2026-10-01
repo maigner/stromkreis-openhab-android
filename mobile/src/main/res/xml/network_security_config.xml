@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<network-security-config xmlns:tools="http://schemas.android.com/tools">
-    <base-config cleartextTrafficPermitted="true"
-        tools:ignore="InsecureBaseConfiguration">
+<!-- The app only talks to stromkreis.net over https, with the system's certificate validation:
+     no cleartext traffic and no user-installed CAs. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
-            <certificates src="system"/>
-            <certificates src="user" tools:ignore="AcceptsUserCertificates" />
+            <certificates src="system" />
         </trust-anchors>
     </base-config>
 </network-security-config>

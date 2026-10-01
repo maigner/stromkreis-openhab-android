@@ -40,9 +40,46 @@ class StromkreisSetupTest {
     }
 
     @Test
-    fun selfHostedPlatformKeepsOrigin() {
-        val link = StromkreisSetup.parse("https://platform.example.org:8443/app/setup/tok")
-        assertEquals(StromkreisSetupLink.Token("tok", "https://platform.example.org:8443"), link)
+    fun rejectsUntrustedHosts() {
+        listOf(
+            "https://platform.example.org/app/setup/tok",
+            "http://stromkreis.net/app/setup/tok",
+            "https://stromkreis.net.evil.example/app/setup/tok",
+            "https://evilstromkreis.net/app/setup/tok",
+            "stromkreis://setup?token=abc&origin=https://evil.example",
+            "stromkreis://setup?token=abc&origin=http://stromkreis.net",
+            "stromkreis://setup?cloudUrl=https://evil.example&username=u&password=p",
+            """{"username":"u","password":"p","cloudUrl":"http://hac.stromkreis.net"}"""
+        ).forEach { payload ->
+            assertNull(payload, StromkreisSetup.parse(payload))
+        }
+    }
+
+    @Test
+    fun upgradesHttpRedirectsOnTrustedHostsOnly() {
+        assertEquals(
+            "https://hac.stromkreis.net/rest/",
+            StromkreisSetup.upgradedToHttps("http://hac.stromkreis.net/rest/")
+        )
+        assertEquals(
+            "https://hac.stromkreis.net/a?b=c",
+            StromkreisSetup.upgradedToHttps("http://hac.stromkreis.net:80/a?b=c")
+        )
+        assertEquals(
+            "https://hac.stromkreis.net:8080/a",
+            StromkreisSetup.upgradedToHttps("http://hac.stromkreis.net:8080/a")
+        )
+        assertNull(StromkreisSetup.upgradedToHttps("http://example.org/rest/"))
+        assertNull(StromkreisSetup.upgradedToHttps("https://hac.stromkreis.net/rest/"))
+    }
+
+    @Test
+    fun trustedDomainCoversSubdomainsOverHttpsOnly() {
+        assertTrue(StromkreisSetup.isTrusted("https://stromkreis.net/"))
+        assertTrue(StromkreisSetup.isTrusted("https://hac.stromkreis.net"))
+        assertFalse(StromkreisSetup.isTrusted("http://hac.stromkreis.net"))
+        assertFalse(StromkreisSetup.isTrusted("https://stromkreis.net.evil.example"))
+        assertFalse(StromkreisSetup.isTrusted("not a url"))
     }
 
     @Test
@@ -76,9 +113,9 @@ class StromkreisSetupTest {
 
     @Test
     fun jsonInlineCredentials() {
-        val json = """{"v":1,"cloudUrl":"https://hac.example.net","username":"u","password":"p"}"""
+        val json = """{"v":1,"cloudUrl":"https://hac2.stromkreis.net","username":"u","password":"p"}"""
         assertEquals(
-            StromkreisSetupLink.Credentials(StromkreisCloudCredentials("https://hac.example.net", "u", "p")),
+            StromkreisSetupLink.Credentials(StromkreisCloudCredentials("https://hac2.stromkreis.net", "u", "p")),
             StromkreisSetup.parse(json)
         )
     }

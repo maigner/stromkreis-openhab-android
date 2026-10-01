@@ -13,7 +13,6 @@
 
 package org.openhab.habdroid.ui.activity
 
-import android.Manifest
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
@@ -30,7 +29,6 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -54,7 +52,6 @@ import org.openhab.habdroid.ui.ConnectionWebViewClient
 import org.openhab.habdroid.ui.MainActivity
 import org.openhab.habdroid.ui.setUpForConnection
 import org.openhab.habdroid.util.getConnectionFactory
-import org.openhab.habdroid.util.hasPermissions
 import org.openhab.habdroid.util.isDarkModeActive
 import org.openhab.habdroid.util.loadActiveServerConfig
 
@@ -73,19 +70,6 @@ class MainUiWebViewFragment :
     private val webView get() = binding?.webview
     private var chromeScript: ScriptHandler? = null
 
-    private val permissionRequester = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { results ->
-        val request = pendingPermissionRequests.remove(results.keys) ?: return@registerForActivityResult
-        val grantedResources = permsToWebResources(results.filter { (_, v) -> v }.keys.toTypedArray())
-        if (grantedResources.isEmpty()) {
-            request.deny()
-        } else {
-            request.grant(grantedResources)
-        }
-    }
-
-    private val pendingPermissionRequests = mutableMapOf<Set<String>, PermissionRequest>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,25 +111,9 @@ class MainUiWebViewFragment :
                 }
 
                 override fun onPermissionRequest(request: PermissionRequest) {
-                    val requestedPerms = request.resources
-                        .mapNotNull { res -> PERMISSION_REQUEST_MAPPING[res] }
-                        .flatten()
-                        .toTypedArray()
-
-                    when {
-                        requestedPerms.isEmpty() -> {
-                            Log.w(TAG, "Requested unknown permissions ${request.resources}")
-                            request.deny()
-                        }
-
-                        requireContext().hasPermissions(requestedPerms) ->
-                            request.grant(permsToWebResources(requestedPerms))
-
-                        else -> {
-                            pendingPermissionRequests[requestedPerms.toSet()] = request
-                            permissionRequester.launch(requestedPerms)
-                        }
-                    }
+                    // The Main UI never gets camera or microphone access (WebRTC)
+                    Log.d(TAG, "Denying web permission request for ${request.resources.joinToString()}")
+                    request.deny()
                 }
 
                 override fun onConsoleMessage(message: ConsoleMessage): Boolean {
@@ -361,16 +329,5 @@ class MainUiWebViewFragment :
         private const val DEFAULT_URL = "/"
         private const val PATH_FOR_ERROR = "/"
         private const val KEY_CURRENT_URL = "url"
-
-        private val PERMISSION_REQUEST_MAPPING = mapOf(
-            PermissionRequest.RESOURCE_VIDEO_CAPTURE to listOf(
-                Manifest.permission.CAMERA
-            )
-        )
-
-        private fun permsToWebResources(androidPermissions: Array<String>) = PERMISSION_REQUEST_MAPPING
-            .filter { (_, perms) -> perms.all { perm -> androidPermissions.contains(perm) } }
-            .keys
-            .toTypedArray()
     }
 }

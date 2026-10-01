@@ -83,16 +83,4 @@
         <item name="colorPrimaryDark">@android:color/background_light</item>
     </style>
 
-    <style name="Theme.MaterialComponents.TranslucentBase">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@null</item>
-    </style>
-
-    <style name="Theme.MaterialComponents.Translucent" parent="Theme.MaterialComponents.TranslucentBase">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
-
 </resources>
