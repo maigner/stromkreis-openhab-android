@@ -82,7 +82,8 @@ the platform serves `https://stromkreis.net/.well-known/assetlinks.json` (route
 The fingerprints come from the platform's `ANDROID_APP_CERT_SHA256` environment variable
 (comma-separated SHA-256 fingerprints of the signing certificates, e.g. from
 `keytool -list -v -keystore release.jks` or the app-signing certificate in the Play Console). The
-manifest declares the `https://stromkreis.net` / `https://www.stromkreis.net` `/app/setup` filter with
+manifest declares the `https://stromkreis.net` `/app/setup` filter (no `www`: that host does not exist, and on
+Android 11 and older one unverifiable host blocks verification of all hosts in the filter) with
 `android:autoVerify="true"`; verification only succeeds once the file is live with the right
 fingerprints. `stromkreis://` links work immediately without server support, which is what the
 "In der App öffnen" button on the fallback page uses.

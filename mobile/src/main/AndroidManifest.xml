@@ -78,7 +78,6 @@
 
                 <data android:scheme="https" />
                 <data android:host="stromkreis.net" />
-                <data android:host="www.stromkreis.net" />
                 <data android:pathPrefix="/app/setup" />
             </intent-filter>
             <intent-filter>

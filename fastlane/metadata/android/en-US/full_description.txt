@@ -1,4 +1,4 @@
-Stromkreis is the open platform by energy communities for energy communities. This app connects members of an Austrian energy community (EEG) to their Stromkreis gateway at home and to the Stromkreis Cloud.
+Stromkreis is the open platform by energy communities for energy communities. This app connects members of an Austrian energy community (EEG) to their Stromkreis gateway at home through the Stromkreis Cloud.
 
 Features:
 
@@ -12,4 +12,4 @@ Stromkreis is non-profit and open source. Learn more at https://stromkreis.net
 
 The Stromkreis gateway runs on openHAB; this app is based on the openHAB Android client (Eclipse Public License 2.0).
 
-Privacy policy: https://stromkreis.net/datenschutz
+Privacy policy: https://stromkreis.net/privacy
